@@ -3,6 +3,9 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="TEMURrentUZ - Global Auto Rental">
+  <!-- Font Awesome (ikonlar uchun) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
   <style>
     :root {
       --primary: #3b82f6;
@@ -34,7 +37,11 @@ import Layout from "../layouts/Layout.astro";
     }
     .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
 
-    header { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    header {
+      padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
+      background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+    }
 
     .logo {
       font-size: 26px; font-weight: 900;
@@ -60,55 +67,56 @@ import Layout from "../layouts/Layout.astro";
     input.error { border-color: var(--error); box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
     .error-text { color: var(--error); font-size: 11px; margin-top: 4px; display: none; }
 
-    .media-upload { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; margin-bottom: 5px; }
-    .media-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: 10px; height: 60px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; position: relative; transition: 0.3s; }
-    .media-box.error { border-color: var(--error); }
-    .media-box.filled { border-color: var(--secondary); color: var(--secondary); }
-
     .hidden { display: none !important; }
     .btn-submit { width: 100%; padding: 16px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 15px; cursor: pointer; font-size: 16px; margin-top: 10px; }
 
-    .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 320px; text-align: center; }
+    .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 340px; text-align: center; }
     .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 15px; }
     .menu-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; text-align: left; width: 100%; background: none; color: white; border: none; }
     .menu-item:hover { background: rgba(255,255,255,0.05); }
+
+    .car-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
+    .car-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+    .car-item h3 { font-size: 16px; margin-bottom: 6px; }
+    .car-item p { font-size: 13px; opacity: 0.75; margin: 3px 0; }
   </style>
 
+  <!-- Til overlay -->
   <div id="overlay-screen">
     <div class="logo" style="margin-bottom: 20px; font-size: 32px;">TEMURrentUZ</div>
     <h2 id="overlay-title">Select Language</h2>
     <div class="scroll-grid" id="overlay-content"></div>
   </div>
 
-  <div id="country-overlay" class="hidden">
-    <h2>Select Country</h2>
-    <div class="scroll-grid" id="country-content"></div>
-    <button onclick="closeCountryPicker()" class="action-btn" style="margin-top: 20px; background: #ef4444;">Cancel</button>
-  </div>
-
+  <!-- Profil overlay -->
   <div id="profile-overlay" class="hidden">
     <div class="profile-menu-card">
       <div id="guest-profile">
         <div class="profile-avatar" style="background: #64748b;"><i class="fas fa-user-secret"></i></div>
         <h3>Guest Mode</h3>
-        <p style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">You are not logged in</p>
-        <button class="menu-item" onclick="goHome(); closeProfile()"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
-        <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
+        <p style="font-size: 12px; opacity: 0.6; margin-bottom: 16px;">You are not logged in</p>
+
+        <button class="menu-item" onclick="openAuthPopup()">
+          <i class="fas fa-sign-in-alt"></i> Login / Register
+        </button>
       </div>
+
       <div id="user-profile" class="hidden">
         <div class="profile-avatar"><i class="fas fa-user"></i></div>
-        <h3 id="prof-name">User Name</h3>
-        <p id="prof-phone" style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">+998 00 000 00 00</p>
-        <button class="menu-item"><i class="fas fa-shield-alt"></i> Security & Privacy</button>
-        <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
-        <button class="menu-item" style="color: #ef4444;" onclick="location.reload()"><i class="fas fa-power-off"></i> Logout</button>
+        <h3 id="prof-name">User</h3>
+        <p id="prof-email" style="font-size: 12px; opacity: 0.6; margin-bottom: 16px;">email</p>
+
+        <button class="menu-item" onclick="logoutNow()" style="color: #ef4444;">
+          <i class="fas fa-power-off"></i> Logout
+        </button>
       </div>
-      <button class="action-btn" onclick="closeProfile()" style="margin-top: 20px; width: 100%;">Close</button>
+
+      <button class="action-btn" onclick="closeProfile()" style="margin-top: 14px; width: 100%;">Close</button>
     </div>
   </div>
 
   <header>
-    <div class="logo" onclick="handleLogoClick()">TEMURrentUZ</div>
+    <div class="logo" onclick="goHome()">TEMURrentUZ</div>
     <div class="profile-trigger" onclick="openProfile()">
       <i class="fas fa-user-circle fa-lg"></i>
       <span id="txt-login">Login</span>
@@ -122,6 +130,7 @@ import Layout from "../layouts/Layout.astro";
         <h3 id="txt-give">Rent Out</h3>
         <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
       </div>
+
       <div class="choice-card" onclick="showRegistration('take')">
         <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
         <h3 id="txt-take">Rent In</h3>
@@ -130,159 +139,279 @@ import Layout from "../layouts/Layout.astro";
     </div>
 
     <div id="form-register" class="card hidden">
-      <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
+      <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Post a car</h2>
 
       <div class="input-group">
         <input type="text" id="inp-name" placeholder="Full Name (e.g. John Doe)">
         <div class="error-text">Invalid name (Enter first and last name)</div>
       </div>
 
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button onclick="openCountryPicker()" id="country-code-btn" style="flex: 0.35; height: 50px;" class="action-btn">+998</button>
-        <div class="input-group" style="flex: 1; margin-bottom: 0;">
-          <input type="text" id="inp-phone" placeholder="Phone (901234567)">
-          <div class="error-text">Invalid phone number</div>
+      <div class="input-group">
+        <input type="text" id="inp-phone" placeholder="Phone (901234567)">
+        <div class="error-text">Invalid phone number</div>
+      </div>
+
+      <div class="input-group">
+        <input type="text" id="inp-model" placeholder="Car Model">
+        <div class="error-text">Model required</div>
+      </div>
+
+      <div class="input-group">
+        <input type="text" id="inp-loc" placeholder="Location">
+        <div class="error-text">Location required</div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <div class="input-group" style="flex:1">
+          <input type="number" id="inp-mon" placeholder="Monthly ($)">
+          <div class="error-text">Invalid price</div>
+        </div>
+        <div class="input-group" style="flex:1">
+          <input type="number" id="inp-year" placeholder="Yearly ($)">
+          <div class="error-text">Invalid price</div>
         </div>
       </div>
 
-      <div id="extra-fields" class="hidden">
-        <div class="input-group"><input type="text" id="inp-model" placeholder="Car Model"><div class="error-text">Model required</div></div>
-        <div class="input-group"><input type="text" id="inp-loc" placeholder="Location"><div class="error-text">Location required</div></div>
-        <div style="display: flex; gap: 10px;">
-          <div class="input-group" style="flex:1"><input type="number" id="inp-mon" placeholder="Monthly ($)"><div class="error-text">Invalid price</div></div>
-          <div class="input-group" style="flex:1"><input type="number" id="inp-year" placeholder="Yearly ($)"><div class="error-text">Invalid price</div></div>
-        </div>
-
-        <div class="media-upload">
-          <div class="media-box" id="box-p1" onclick="document.getElementById('file-p1').click()"><i class="fas fa-camera"></i><input type="file" id="file-p1" class="hidden" onchange="checkFile(this)"></div>
-          <div class="media-box" id="box-p2" onclick="document.getElementById('file-p2').click()"><i class="fas fa-camera"></i><input type="file" id="file-p2" class="hidden" onchange="checkFile(this)"></div>
-          <div class="media-box" id="box-p3" onclick="document.getElementById('file-p3').click()"><i class="fas fa-camera"></i><input type="file" id="file-p3" class="hidden" onchange="checkFile(this)"></div>
-          <div class="media-box" id="box-p4" onclick="document.getElementById('file-p4').click()"><i class="fas fa-camera"></i><input type="file" id="file-p4" class="hidden" onchange="checkFile(this)"></div>
-          <div class="media-box" id="box-v1" style="border-style: solid;" onclick="document.getElementById('file-v1').click()"><i class="fas fa-video"></i><input type="file" id="file-v1" class="hidden" onchange="checkFile(this)"></div>
-        </div>
-
-        <div class="error-text" id="err-media" style="margin-bottom: 15px;">Please upload all 4 photos and 1 video</div>
-      </div>
-
-      <button class="btn-submit" id="btn-next" onclick="handleFormSubmit()">Continue</button>
-      <p onclick="goBack()" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;" id="txt-back">← Back</p>
+      <button class="btn-submit" id="btn-next" onclick="handleFormSubmit()">Post Ad</button>
+      <p onclick="goHome()" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;" id="txt-back">← Back</p>
     </div>
 
     <div id="car-results" class="hidden">
       <h2 id="txt-title-take">Available Cars</h2>
-      <div class="car-grid"><div class="car-item"><h3>Chevrolet Tahoe</h3><p>$1200/mo</p></div></div>
+      <div class="car-grid" id="car-grid"></div>
+      <button class="action-btn" style="margin-top: 14px;" onclick="goHome()">← Back</button>
     </div>
   </div>
 
-  <!-- Font Awesome + Supabase -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" is:inline></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" is:inline></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script is:inline>
-    let isRegistered = false;
-    let userData = { name: '', phone: '' };
+    // =========================
+    // 1) SUPABASE SETTINGS (BU 2 TASINI O'ZGARTIR!)
+    // =========================
+    const SUPABASE_URL = "PASTE_SUPABASE_URL_HERE";
+    const SUPABASE_ANON_KEY = "PASTE_SUPABASE_ANON_KEY_HERE";
 
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // =========================
+    // 2) UI helpers
+    // =========================
+    function openProfile() { document.getElementById('profile-overlay').classList.remove('hidden'); }
+    function closeProfile() { document.getElementById('profile-overlay').classList.add('hidden'); }
+
+    function show(elId) { document.getElementById(elId).classList.remove('hidden'); }
+    function hide(elId) { document.getElementById(elId).classList.add('hidden'); }
+
+    function goHome() {
+      hide('form-register');
+      hide('car-results');
+      show('step-choice');
+      closeProfile();
+    }
+
+    // =========================
+    // 3) Language overlay (minimal)
+    // =========================
     const translations = {
-      "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", title_give: "Ma'lumotlar", title_take: "Mashinalar", model: "Model", phone: "Telefon", social: "Telegram/WhatsApp", loc: "Manzil", mon: "Oylik ($)", year: "Yillik ($)", submit: "Joylash", back: "← Orqaga", price: "Narx:" },
-      "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", title_give: "Details", title_take: "Cars", model: "Model", phone: "Phone", social: "Social Media", loc: "Location", mon: "Monthly ($)", year: "Yearly ($)", submit: "Post Ad", back: "← Back", price: "Price:" }
+      "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", post: "E'lon berish", cars: "Mashinalar" },
+      "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", post: "Post a car", cars: "Available Cars" }
     };
-
-    const countries = [
-      { n: "Uzbekistan", c: "+998" }, { n: "USA", c: "+1" }, { n: "Russia", c: "+7" },
-      { n: "Turkey", c: "+90" }, { n: "Germany", c: "+49" }, { n: "UK", c: "+44" },
-      { n: "UAE", c: "+971" }
-    ];
 
     const overlayContent = document.getElementById('overlay-content');
     Object.keys(translations).forEach(l => {
       const b = document.createElement('button');
-      b.className = "action-btn"; b.innerText = l; b.onclick = () => setLang(l);
+      b.className = "action-btn";
+      b.innerText = l;
+      b.onclick = () => setLang(l);
       overlayContent.appendChild(b);
     });
 
     function setLang(lang) {
       const t = translations[lang];
-      document.getElementById('txt-login').innerText = isRegistered ? userData.name.split(' ')[0] : t.login;
+      document.getElementById('txt-login').innerText = t.login;
       document.getElementById('txt-give').innerText = t.give;
       document.getElementById('txt-take').innerText = t.take;
-      document.getElementById('btn-next').innerText = t.submit;
-      document.getElementById('txt-back').innerText = t.back;
+      document.getElementById('txt-givesub').innerText = t.givesub;
+      document.getElementById('txt-takesub').innerText = t.takesub;
+      document.getElementById('reg-title').innerText = t.post;
+      document.getElementById('txt-title-take').innerText = t.cars;
       document.getElementById('overlay-screen').style.display = "none";
     }
 
-    function handleLogoClick() { goHome(); document.getElementById('overlay-screen').style.display = "flex"; closeProfile(); }
-    function openProfile() { document.getElementById('profile-overlay').classList.remove('hidden'); }
-    function closeProfile() { document.getElementById('profile-overlay').classList.add('hidden'); }
-
-    function checkFile(input) {
-      const box = input.parentElement;
-      if(input.files.length > 0) { box.classList.add('filled'); box.classList.remove('error'); }
+    // =========================
+    // 4) Auth (email+password)
+    // =========================
+    async function getUser() {
+      const { data } = await supabase.auth.getUser();
+      return data?.user || null;
     }
 
-    function goHome() {
-      document.querySelectorAll('input').forEach(i => { i.classList.remove('error'); });
-      document.querySelectorAll('.error-text').forEach(e => { e.style.display = 'none'; });
-      document.getElementById('form-register').classList.add('hidden');
-      document.getElementById('car-results').classList.add('hidden');
-      document.getElementById('step-choice').classList.remove('hidden');
+    async function refreshProfileUI() {
+      const user = await getUser();
+      if (!user) {
+        document.getElementById('txt-login').innerText = "Login";
+        document.getElementById('guest-profile').classList.remove('hidden');
+        document.getElementById('user-profile').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('txt-login').innerText = user.email;
+      document.getElementById('prof-name').innerText = "Account";
+      document.getElementById('prof-email').innerText = user.email;
+      document.getElementById('guest-profile').classList.add('hidden');
+      document.getElementById('user-profile').classList.remove('hidden');
     }
 
+    async function openAuthPopup() {
+      const email = prompt("Email:");
+      const password = prompt("Password (kamida 6 ta belgi):");
+      if (!email || !password) return;
+
+      // avval login
+      let { error } = await supabase.auth.signInWithPassword({ email, password });
+
+      // login bo'lmasa -> signUp taklif
+      if (error) {
+        const ok = confirm("Login bo'lmadi. Yangi akkaunt ochaymi?");
+        if (!ok) return;
+        const res = await supabase.auth.signUp({ email, password });
+        if (res.error) return alert(res.error.message);
+        alert("Akkaunt yaratildi! Endi login qilib ko'ring (email tasdiqlash yoqilgan bo'lishi mumkin).");
+      } else {
+        alert("Login bo'ldi ✅");
+      }
+
+      await refreshProfileUI();
+      closeProfile();
+    }
+
+    async function logoutNow() {
+      await supabase.auth.signOut();
+      await refreshProfileUI();
+      closeProfile();
+      alert("Logout ✅");
+    }
+
+    // =========================
+    // 5) App logic
+    // =========================
     let currentMode = '';
+
     function showRegistration(mode) {
       currentMode = mode;
-      document.getElementById('step-choice').classList.add('hidden');
-      document.getElementById('form-register').classList.remove('hidden');
-      if(mode === 'give') document.getElementById('extra-fields').classList.remove('hidden');
-      else document.getElementById('extra-fields').classList.add('hidden');
+
+      if (mode === 'give') {
+        hide('step-choice');
+        hide('car-results');
+        show('form-register');
+      } else {
+        // take
+        loadCars();
+      }
     }
 
-    function handleFormSubmit() {
-      let allValid = true;
-      const checks = [{id: 'inp-name', type: 'name'}, {id: 'inp-phone', type: 'phone'}];
-      if (currentMode === 'give') {
-        checks.push({id: 'inp-model', type: 'text'}, {id: 'inp-loc', type: 'text'}, {id: 'inp-mon', type: 'number'}, {id: 'inp-year', type: 'number'});
-        const mediaOk = ['file-p1', 'file-p2', 'file-p3', 'file-p4', 'file-v1'].every(id => document.getElementById(id).files.length > 0);
-        if(!mediaOk) { document.getElementById('err-media').style.display = 'block'; allValid = false; }
+    function markError(inputId, isError) {
+      const el = document.getElementById(inputId);
+      const err = el.nextElementSibling;
+      if (isError) { el.classList.add('error'); err.style.display = 'block'; }
+      else { el.classList.remove('error'); err.style.display = 'none'; }
+    }
+
+    async function handleFormSubmit() {
+      const user = await getUser();
+      if (!user) {
+        alert("Avval Login qiling!");
+        openProfile();
+        return;
       }
 
-      checks.forEach(check => {
-        const el = document.getElementById(check.id);
-        const val = el.value.trim();
-        let isOk = false;
+      const name = document.getElementById('inp-name').value.trim();
+      const phone = document.getElementById('inp-phone').value.trim();
+      const model = document.getElementById('inp-model').value.trim();
+      const location = document.getElementById('inp-loc').value.trim();
+      const monthly = Number(document.getElementById('inp-mon').value);
+      const yearly = Number(document.getElementById('inp-year').value);
 
-        if(check.type === 'text') isOk = val !== "";
-        else if(check.type === 'name') isOk = val.split(' ').length >= 2;
-        else if(check.type === 'phone') isOk = /^\d{7,15}$/.test(val);
-        else if(check.type === 'number') isOk = !isNaN(val) && parseFloat(val) > 0;
+      let ok = true;
+      markError('inp-name', !(name.split(' ').length >= 2)); if (!(name.split(' ').length >= 2)) ok = false;
+      markError('inp-phone', !(/^\d{7,15}$/.test(phone))); if (!(/^\d{7,15}$/.test(phone))) ok = false;
+      markError('inp-model', !(model !== "")); if (!(model !== "")) ok = false;
+      markError('inp-loc', !(location !== "")); if (!(location !== "")) ok = false;
+      markError('inp-mon', !(monthly > 0)); if (!(monthly > 0)) ok = false;
+      markError('inp-year', !(yearly > 0)); if (!(yearly > 0)) ok = false;
 
-        if (!isOk) { el.classList.add('error'); el.nextElementSibling.style.display = 'block'; allValid = false; }
-        else { el.classList.remove('error'); el.nextElementSibling.style.display = 'none'; }
+      if (!ok) return;
+
+      const { error } = await supabase.from("cars").insert({
+        user_id: user.id,
+        name,
+        phone,
+        model,
+        location,
+        monthly,
+        yearly
       });
 
-      if(allValid) {
-        isRegistered = true;
-        userData.name = document.getElementById('inp-name').value;
-        userData.phone = document.getElementById('country-code-btn').innerText + " " + document.getElementById('inp-phone').value;
-
-        document.getElementById('prof-name').innerText = userData.name;
-        document.getElementById('prof-phone').innerText = userData.phone;
-        document.getElementById('txt-login').innerText = userData.name.split(' ')[0];
-
-        document.getElementById('guest-profile').classList.add('hidden');
-        document.getElementById('user-profile').classList.remove('hidden');
-
-        if(currentMode === 'take') {
-          document.getElementById('form-register').classList.add('hidden');
-          document.getElementById('car-results').classList.remove('hidden');
-        } else {
-          alert("Success!");
-          goHome();
-        }
+      if (error) {
+        alert("DB error: " + error.message);
+        return;
       }
+
+      alert("E'lon saqlandi ✅");
+      goHome();
     }
 
-    function goBack() { goHome(); }
-    function openCountryPicker() { document.getElementById('country-overlay').classList.remove('hidden'); }
-    function closeCountryPicker() { document.getElementById('country-overlay').classList.add('hidden'); }
+    async function loadCars() {
+      hide('step-choice');
+      hide('form-register');
+      show('car-results');
+
+      const grid = document.getElementById('car-grid');
+      grid.innerHTML = "<p style='opacity:.7'>Loading...</p>";
+
+      const { data, error } = await supabase
+        .from("cars")
+        .select("model, location, monthly, yearly, name, phone, created_at")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        grid.innerHTML = "";
+        alert("Load error: " + error.message);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        grid.innerHTML = "<p style='opacity:.7'>Hali e'lon yo'q.</p>";
+        return;
+      }
+
+      grid.innerHTML = data.map(c => `
+        <div class="car-item">
+          <h3>${escapeHtml(c.model)}</h3>
+          <p><b>Location:</b> ${escapeHtml(c.location)}</p>
+          <p><b>Monthly:</b> $${Number(c.monthly).toFixed(0)}</p>
+          <p><b>Yearly:</b> $${Number(c.yearly).toFixed(0)}</p>
+          <p style="margin-top:8px; opacity:.6"><b>Owner:</b> ${escapeHtml(c.name)} (${escapeHtml(c.phone)})</p>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (m) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[m]));
+    }
+
+    // =========================
+    // 6) Init
+    // =========================
+    (async () => {
+      await refreshProfileUI();
+      // Agar xohlasang, til overlayni avtomatik yashirish uchun:
+      // document.getElementById('overlay-screen').style.display = "none";
+    })();
   </script>
 </Layout>
