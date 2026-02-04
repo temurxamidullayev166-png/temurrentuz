@@ -1,14 +1,352 @@
----
----
 <!DOCTYPE html>
 <html lang="uz">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Temur REN UZ</title>
-  </head>
-  <body>
-    <h1>Salom! 👋</h1>
-    <p>Bu mening birinchi Netlify + Astro saytim.</p>
-  </body>
-</html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEMURrentUZ - Global Auto Rental</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --dark: #070b14;
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.1);
+            --error: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: radial-gradient(circle at top right, #1e293b, #070b14); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
 
+        #overlay-screen, #country-overlay, #profile-overlay {
+            position: fixed; inset: 0; background: var(--dark); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #profile-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(15px); z-index: 1200; }
+        #country-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(10px); z-index: 1100; }
+
+        .scroll-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px; max-width: 1000px; width: 90%; margin-top: 20px;
+            max-height: 70vh; overflow-y: auto; padding: 20px;
+        }
+        .action-btn {
+            padding: 12px; background: var(--card-bg); border: 1px solid var(--border);
+            color: white; border-radius: 12px; cursor: pointer; transition: 0.3s;
+            font-size: 14px; text-align: center;
+        }
+        .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
+
+        header { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        
+        .logo {
+            font-size: 26px; font-weight: 900;
+            background: linear-gradient(to right, #3b82f6, #60a5fa);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: transparent;
+            display: inline-block; cursor: pointer;
+        }
+
+        .profile-trigger { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 20px; transition: 0.3s; }
+        .profile-trigger:hover { background: var(--card-bg); }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .card { background: var(--card-bg); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 30px; padding: 35px; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .choice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .choice-card { padding: 40px 20px; text-align: center; border-radius: 25px; cursor: pointer; transition: 0.4s; border: 1px solid var(--border); background: var(--card-bg); }
+        .choice-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+
+        .input-group { margin-bottom: 15px; position: relative; }
+        input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; transition: 0.3s; }
+        input.error { border-color: var(--error); box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+        .error-text { color: var(--error); font-size: 11px; margin-top: 4px; display: none; }
+
+        .media-upload { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; margin-bottom: 5px; }
+        .media-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: 10px; height: 60px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; position: relative; transition: 0.3s; }
+        .media-box.error { border-color: var(--error); }
+        .media-box.filled { border-color: var(--secondary); color: var(--secondary); }
+
+        .hidden { display: none !important; }
+        .btn-submit { width: 100%; padding: 16px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 15px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+
+        .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 320px; text-align: center; }
+        .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 15px; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; text-align: left; width: 100%; background: none; color: white; border: none; }
+        .menu-item:hover { background: rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+
+    <div id="overlay-screen">
+        <div class="logo" style="margin-bottom: 20px; font-size: 32px;">TEMURrentUZ</div>
+        <h2 id="overlay-title">Select Language</h2>
+        <div class="scroll-grid" id="overlay-content"></div>
+    </div>
+
+    <div id="country-overlay" class="hidden">
+        <h2>Select Country</h2>
+        <div class="scroll-grid" id="country-content"></div>
+        <button onclick="closeCountryPicker()" class="action-btn" style="margin-top: 20px; background: #ef4444;">Cancel</button>
+    </div>
+
+    <div id="profile-overlay" class="hidden">
+        <div class="profile-menu-card">
+            <div id="guest-profile">
+                <div class="profile-avatar" style="background: #64748b;"><i class="fas fa-user-secret"></i></div>
+                <h3>Guest Mode</h3>
+                <p style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">You are not logged in</p>
+                <button class="menu-item" onclick="goHome(); closeProfile()"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
+                <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
+            </div>
+            <div id="user-profile" class="hidden">
+                <div class="profile-avatar"><i class="fas fa-user"></i></div>
+                <h3 id="prof-name">User Name</h3>
+                <p id="prof-phone" style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">+998 00 000 00 00</p>
+                <button class="menu-item"><i class="fas fa-shield-alt"></i> Security & Privacy</button>
+                <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
+                <button class="menu-item" style="color: #ef4444;" onclick="location.reload()"><i class="fas fa-power-off"></i> Logout</button>
+            </div>
+            <button class="action-btn" onclick="closeProfile()" style="margin-top: 20px; width: 100%;">Close</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo" onclick="handleLogoClick()">TEMURrentUZ</div>
+        <div class="profile-trigger" onclick="openProfile()">
+            <i class="fas fa-user-circle fa-lg"></i> 
+            <span id="txt-login">Login</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="step-choice" class="choice-btns">
+            <div class="choice-card" onclick="showRegistration('give')">
+                <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+                <h3 id="txt-give">Rent Out</h3>
+                <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
+            </div>
+            <div class="choice-card" onclick="showRegistration('take')">
+                <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
+                <h3 id="txt-take">Rent In</h3>
+                <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
+            </div>
+        </div>
+
+        <div id="form-register" class="card hidden">
+            <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
+            <div class="input-group">
+                <input type="text" id="inp-name" placeholder="Full Name (e.g. John Doe)">
+                <div class="error-text">Invalid name (Enter first and last name)</div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button onclick="openCountryPicker()" id="country-code-btn" style="flex: 0.35; height: 50px;" class="action-btn">+998</button>
+                <div class="input-group" style="flex: 1; margin-bottom: 0;">
+                    <input type="text" id="inp-phone" placeholder="Phone (901234567)">
+                    <div class="error-text">Invalid phone number</div>
+                </div>
+            </div>
+            <div id="extra-fields" class="hidden">
+                <div class="input-group"><input type="text" id="inp-model" placeholder="Car Model"><div class="error-text">Model required</div></div>
+                <div class="input-group"><input type="text" id="inp-loc" placeholder="Location"><div class="error-text">Location required</div></div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex:1"><input type="number" id="inp-mon" placeholder="Monthly ($)"><div class="error-text">Invalid price</div></div>
+                    <div class="input-group" style="flex:1"><input type="number" id="inp-year" placeholder="Yearly ($)"><div class="error-text">Invalid price</div></div>
+                </div>
+                <div class="media-upload">
+                    <div class="media-box" id="box-p1" onclick="document.getElementById('file-p1').click()"><i class="fas fa-camera"></i><input type="file" id="file-p1" class="hidden" onchange="checkFile(this)"></div>
+                    <div class="media-box" id="box-p2" onclick="document.getElementById('file-p2').click()"><i class="fas fa-camera"></i><input type="file" id="file-p2" class="hidden" onchange="checkFile(this)"></div>
+                    <div class="media-box" id="box-p3" onclick="document.getElementById('file-p3').click()"><i class="fas fa-camera"></i><input type="file" id="file-p3" class="hidden" onchange="checkFile(this)"></div>
+                    <div class="media-box" id="box-p4" onclick="document.getElementById('file-p4').click()"><i class="fas fa-camera"></i><input type="file" id="file-p4" class="hidden" onchange="checkFile(this)"></div>
+                    <div class="media-box" id="box-v1" style="border-style: solid;" onclick="document.getElementById('file-v1').click()"><i class="fas fa-video"></i><input type="file" id="file-v1" class="hidden" onchange="checkFile(this)"></div>
+                </div>
+                <div class="error-text" id="err-media" style="margin-bottom: 15px;">Please upload all 4 photos and 1 video</div>
+            </div>
+            <button class="btn-submit" id="btn-next" onclick="handleFormSubmit()">Continue</button>
+            <p onclick="goBack()" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;" id="txt-back">← Back</p>
+        </div>
+
+        <div id="car-results" class="hidden">
+            <h2 id="txt-title-take">Available Cars</h2>
+            <div class="car-grid"><div class="car-item"><h3>Chevrolet Tahoe</h3><p>$1200/mo</p></div></div>
+        </div>
+    </div>
+
+   <script>
+        let isRegistered = false;
+        let userData = { name: '', phone: '' };
+
+       
+        const translations = {
+            "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", title_give: "Ma'lumotlar", title_take: "Mashinalar", model: "Model", phone: "Telefon", social: "Telegram/WhatsApp", loc: "Manzil", mon: "Oylik ($)", year: "Yillik ($)", submit: "Joylash", back: "← Orqaga", price: "Narx:" },
+            "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", title_give: "Details", title_take: "Cars", model: "Model", phone: "Phone", social: "Social Media", loc: "Location", mon: "Monthly ($)", year: "Yearly ($)", submit: "Post Ad", back: "← Back", price: "Price:" },
+            "Русский": { login: "Вход", give: "Сдать", take: "Снять", givesub: "Добавить авто", takesub: "Поиск авто", title_give: "Данные", title_take: "Машины", model: "Модель", phone: "Телефон", social: "Соцсети", loc: "Адрес", mon: "Месяц ($)", year: "Год ($)", submit: "Разместить", back: "← Назад", price: "Цена:" },
+            "Türkçe": { login: "Giriş", give: "Kiraya Ver", take: "Kiralık Al", givesub: "Araba Ekle", takesub: "Araba Ara", title_give: "Detaylar", title_take: "Arabalar", model: "Model", phone: "Telefon", social: "Sosyal Medya", loc: "Konum", mon: "Aylık ($)", year: "Yıllık ($)", submit: "Yayınla", back: "← Geri", price: "Fiyat:" },
+            "Deutsch": { login: "Anmelden", give: "Vermieten", take: "Mieten", givesub: "Auto hinzufügen", takesub: "Auto suchen", title_give: "Details", title_take: "Autos", model: "Modell", phone: "Telefon", social: "Social Media", loc: "Standort", mon: "Monatlich ($)", year: "Jährlich ($)", submit: "Senden", back: "← Zurück", price: "Preis:" },
+            "Français": { login: "Connexion", give: "Louer", take: "Prendre", givesub: "Ajouter", takesub: "Chercher", title_give: "Détails", title_take: "Voitures", model: "Modèle", phone: "Téléphone", social: "Réseaux sociaux", loc: "Emplacement", mon: "Mensuel ($)", year: "Annuel ($)", submit: "Publier", back: "← Retour", price: "Prix:" },
+            "Español": { login: "Entrar", give: "Alquilar", take: "Rentar", givesub: "Añadir", takesub: "Buscar", title_give: "Detalles", title_take: "Autos", model: "Modelo", phone: "Teléfono", social: "Redes", loc: "Ubicación", mon: "Mensual ($)", year: "Anual ($)", submit: "Publicar", back: "← Volver", price: "Precio:" },
+            "Italiano": { login: "Accedi", give: "Noleggia", take: "Affitta", givesub: "Aggiungi", takesub: "Cerca", title_give: "Dettagli", title_take: "Auto", model: "Modello", phone: "Telefono", social: "Social", loc: "Posizione", mon: "Mensile ($)", year: "Annuale ($)", submit: "Invia", back: "← Indietro", price: "Prezzo:" },
+            "Português": { login: "Entrar", give: "Alugar", take: "Arrendar", givesub: "Adicionar", takesub: "Procurar", title_give: "Detalhes", title_take: "Carros", model: "Modelo", phone: "Telefone", social: "Redes", loc: "Localização", mon: "Mensal ($)", year: "Anual ($)", submit: "Postar", back: "← Voltar", price: "Preço:" },
+            "العربية": { login: "دخول", give: "تأجير", take: "استئجار", givesub: "إضافة", takesub: "بحث", title_give: "تفاصيل", title_take: "سيارات", model: "موديل", phone: "هاتف", social: "تواصل", loc: "موقع", mon: "شهري ($)", year: "سنوي ($)", submit: "نشر", back: "← عودة", price: "السعر:" },
+            "हिन्दी": { login: "लॉगिन", give: "किराये पर दें", take: "किराये पर लें", givesub: "गाड़ी जोड़ें", takesub: "खोजें", title_give: "विवरण", title_take: "गाड़ियाँ", model: "मॉडल", phone: "फ़ोन", social: "सोशल मीडिया", loc: "स्थान", mon: "मासिक ($)", year: "वार्षिक ($)", submit: "पोस्ट करें", back: "← पीछे", price: "कीमत:" },
+            "日本語": { login: "ログイン", give: "貸し出す", take: "借りる", givesub: "車を追加", takesub: "検索", title_give: "詳細", title_take: "車リスト", model: "モデル", phone: "電話", social: "SNS", loc: "場所", mon: "月額 ($)", year: "年額 ($)", submit: "投稿", back: "← 戻る", price: "価格:" },
+            "한국어": { login: "로그인", give: "대여하기", take: "임차하기", givesub: "차량 추가", takesub: "검색", title_give: "세부사항", title_take: "차량 목록", model: "모델", phone: "전화", social: "SNS", loc: "위치", mon: "월간 ($)", year: "연간 ($)", submit: "등록", back: "← 뒤로", price: "가격:" },
+            "中文": { login: "登录", give: "出租", take: "租车", givesub: "添加车辆", takesub: "搜索", title_give: "详情", title_take: "车辆列表", model: "型号", phone: "电话", social: "社交媒体", loc: "地点", mon: "每月 ($)", year: "每年 ($)", submit: "发布", back: "← 返回", price: "价格:" },
+            "Tiếng Việt": { login: "Đăng nhập", give: "Cho thuê", take: "Thuê xe", givesub: "Thêm xe", takesub: "Tìm kiếm", title_give: "Chi tiết", title_take: "Danh sách xe", model: "Mẫu xe", phone: "Điện thoại", social: "Mạng xã hội", loc: "Địa điểm", mon: "Hàng tháng ($)", year: "Hàng năm ($)", submit: "Đăng tin", back: "← Quay lại", price: "Giá:" },
+            "Қазақша": { login: "Кіру", give: "Жалға беру", take: "Жалға алу", givesub: "Көлік қосу", takesub: "Көлік іздеу", title_give: "Мәліметтер", title_take: "Көліктер", model: "Модель", phone: "Телефон", social: "Әлеуметтік желі", loc: "Мекенжай", mon: "Айлық ($)", year: "Жылдық ($)", submit: "Жариялау", back: "← Артқа", price: "Баға:" },
+            "Polski": { login: "Zaloguj", give: "Wynajmij", take: "Wypożycz", givesub: "Dodaj auto", takesub: "Szukaj", title_give: "Szczegóły", title_take: "Auta", model: "Model", phone: "Telefon", social: "Media", loc: "Lokalizacja", mon: "Miesięcznie ($)", year: "Rocznie ($)", submit: "Wyślij", back: "← Wstecz", price: "Cena:" },
+            "Nederlands": { login: "Inloggen", give: "Verhuren", take: "Huren", givesub: "Auto toevoegen", takesub: "Zoeken", title_give: "Details", title_take: "Auto's", model: "Model", phone: "Telefoon", social: "Sociale Media", loc: "Locatie", mon: "Maandelijks ($)", year: "Jaarlijks ($)", submit: "Plaatsen", back: "← Terug", price: "Prijs:" },
+            "Svenska": { login: "Logga in", give: "Hyr ut", take: "Hyra", givesub: "Lägg till", takesub: "Sök bilar", title_give: "Detaljer", title_take: "Bilar", model: "Modell", phone: "Telefon", social: "Sociala Medier", loc: "Plats", mon: "Månadsvis ($)", year: "Årligen ($)", submit: "Publicera", back: "← Bakåt", price: "Pris:" },
+            "Norsk": { login: "Logg inn", give: "Lei ut", take: "Lei", givesub: "Legg til bil", takesub: "Søk bil", title_give: "Detaljer", title_take: "Biler", model: "Modell", phone: "Telefon", social: "Sosiale Medier", loc: "Sted", mon: "Månedlig ($)", year: "Årlig ($)", submit: "Publiser", back: "← Tilbake", price: "Pris:" },
+            "Suomi": { login: "Kirjaudu", give: "Vuokraa", take: "Vuokraus", givesub: "Lisää auto", takesub: "Etsi autoja", title_give: "Tiedot", title_take: "Autot", model: "Malli", phone: "Puhelin", social: "Sosiaalinen media", loc: "Sijainti", mon: "Kuukausi ($)", year: "Vuosi ($)", submit: "Ilmoita", back: "← Takaisin", price: "Hinta:" },
+            "Dansk": { login: "Log ind", give: "Udlej", take: "Leje", givesub: "Tilføj bil", takesub: "Søg bil", title_give: "Detaljer", title_take: "Biler", model: "Model", phone: "Telefon", social: "Sociale medier", loc: "Placering", mon: "Månedlig ($)", year: "Årligt ($)", submit: "Indsend", back: "← Tilbage", price: "Pris:" },
+            "Ελληνικά": { login: "Είσοδος", give: "Ενοικίαση", take: "Πάρτε", givesub: "Προσθήκη", takesub: "Αναζήτηση", title_give: "Λεπτομέρειες", title_take: "Αυτοκίνητα", model: "Μοντέλο", phone: "Τηλέφωνο", social: "Social Media", loc: "Τοποθεσία", mon: "Μηνιαία ($)", year: "Ετήσια ($)", submit: "Δημοσίευση", back: "← Πίσω", price: "Τιμή:" },
+            "Magyar": { login: "Belépés", give: "Bérbeadás", take: "Bérlés", givesub: "Autó hozzáadása", takesub: "Keresés", title_give: "Részletek", title_take: "Autók", model: "Modell", phone: "Telefon", social: "Közösségi média", loc: "Helyszín", mon: "Havi ($)", year: "Éves ($)", submit: "Közzététel", back: "← Vissza", price: "Ár:" },
+            "Čeština": { login: "Přihlásit", give: "Pronajmout", take: "Půjčit", givesub: "Přidat auto", takesub: "Hledat", title_give: "Detaily", title_take: "Auta", model: "Model", phone: "Telefon", social: "Sociální sítě", loc: "Poloha", mon: "Měsíčně ($)", year: "Ročně ($)", submit: "Publikovat", back: "← Zpět", price: "Cena:" },
+            "Slovenčina": { login: "Prihlásiť", give: "Prenajať", take: "Požičať", givesub: "Pridať auto", takesub: "Hľadať", title_give: "Detaily", title_take: "Autá", model: "Model", phone: "Telefón", social: "Sociálne siete", loc: "Poloha", mon: "Mesačne ($)", year: "Ročne ($)", submit: "Odoslať", back: "← Späť", price: "Cena:" },
+            "Română": { login: "Autentificare", give: "Închiriază", take: "Ia", givesub: "Adaugă mașină", takesub: "Caută", title_give: "Detalii", title_take: "Mașini", model: "Model", phone: "Telefon", social: "Social Media", loc: "Locație", mon: "Lunar ($)", year: "Anual ($)", submit: "Postează", back: "← Înapoi", price: "Preț:" },
+            "Български": { login: "Вход", give: "Давам под наем", take: "Наемам", givesub: "Добави кола", takesub: "Търсене", title_give: "Детайли", title_take: "Коли", model: "Модел", phone: "Телефон", social: "Социални мрежи", loc: "Локация", mon: "Месечно ($)", year: "Годишно ($)", submit: "Публикувай", back: "← Назад", price: "Цена:" },
+            "Українська": { login: "Увійти", give: "Здати в оренду", take: "Орендувати", givesub: "Додати авто", takesub: "Пошук", title_give: "Деталі", title_take: "Машини", model: "Модель", phone: "Телефон", social: "Соцмережі", loc: "Адреса", mon: "Місяць ($)", year: "Рік ($)", submit: "Розмістити", back: "← Назад", price: "Ціна:" },
+            "Hrvatski": { login: "Prijavi se", give: "Iznajmi", take: "Unajmi", givesub: "Dodaj auto", takesub: "Pretraži", title_give: "Detalji", title_take: "Auti", model: "Model", phone: "Telefon", social: "Društvene mreže", loc: "Lokacija", mon: "Mjesečno ($)", year: "Godišnje ($)", submit: "Objavi", back: "← Natrag", price: "Cijena:" },
+            "Srpski": { login: "Prijavi se", give: "Izdaj", take: "Iznajmi", givesub: "Dodaj auto", takesub: "Pretraži", title_give: "Detalji", title_take: "Auti", model: "Model", phone: "Telefon", social: "Društvene mreže", loc: "Lokacija", mon: "Mesečno ($)", year: "Godišnje ($)", submit: "Objavi", back: "← Nazad", price: "Cena:" },
+            "Lietuvių": { login: "Prisijungti", give: "Išnuomoti", take: "Nuomotis", givesub: "Pridėti", takesub: "Paieška", title_give: "Detalės", title_take: "Automobiliai", model: "Modelis", phone: "Telefonas", social: "Tinklai", loc: "Vieta", mon: "Mėnuo ($)", year: "Metai ($)", submit: "Skelbti", back: "← Atgal", price: "Kaina:" },
+            "Latviešu": { login: "Ielogoties", give: "Izīrēt", take: "Īrēt", givesub: "Pievienot auto", takesub: "Meklēt", title_give: "Detaļas", title_take: "Auto", model: "Modelis", phone: "Tālrunis", social: "Tīkli", loc: "Vieta", mon: "Mēnesī ($)", year: "Gadā ($)", submit: "Publicēt", back: "← Atpaka", price: "Cena:" },
+            "Eesti": { login: "Logi sisse", give: "Rendi välja", take: "Rendi", givesub: "Lisa auto", takesub: "Otsi", title_give: "Detailid", title_take: "Autod", model: "Mudel", phone: "Telefon", social: "Sotsiaalmeedia", loc: "Asukoht", mon: "Kuus ($)", year: "Aastas ($)", submit: "Postita", back: "← Tagasi", price: "Hind:" },
+            "Bahasa Indonesia": { login: "Masuk", give: "Sewakan", take: "Sewa", givesub: "Tambah mobil", takesub: "Cari", title_give: "Detail", title_take: "Mobil", model: "Model", phone: "Telepon", social: "Media Sosial", loc: "Lokasi", mon: "Bulanan ($)", year: "Tahunan ($)", submit: "Posting", back: "← Kembali", price: "Harga:" },
+            "Melayu": { login: "Log masuk", give: "Sewakan", take: "Sewa", givesub: "Tambah kereta", takesub: "Cari", title_give: "Butiran", title_take: "Kereta", model: "Model", phone: "Telefon", social: "Media Sosial", loc: "Lokasi", mon: "Bulanan ($)", year: "Tahunan ($)", submit: "Siarkan", back: "← Kembali", price: "Harga:" },
+            "ไทย": { login: "เข้าสู่ระบบ", give: "ให้เช่า", take: "เช่ารถ", givesub: "เพิ่มรถ", takesub: "ค้นหา", title_give: "รายละเอียด", title_take: "รถยนต์", model: "รุ่น", phone: "โทรศัพท์", social: "โซเชียล", loc: "ที่อยู่", mon: "รายเดือน ($)", year: "รายปี ($)", submit: "โพสต์", back: "← กลับ", price: "ราคา:" },
+            "Filipino": { login: "Mag-login", give: "Paupahan", take: "Umuwa", givesub: "Magdagdag", takesub: "Maghanap", title_give: "Detalye", title_take: "Mga Kotse", model: "Modelo", phone: "Telepono", social: "Social Media", loc: "Lokasyon", mon: "Buwanan ($)", year: "Taunan ($)", submit: "I-post", back: "← Bumalik", price: "Presyo:" },
+            "עברית": { login: "התחבר", give: "להשכיר", take: "לשכור", givesub: "הוסף רכב", takesub: "חפש רכב", title_give: "פרטים", title_take: "רכבים", model: "מודל", phone: "טלפון", social: "מדיה חברתית", loc: "מיקום", mon: "חודשי ($)", year: "שנתי ($)", submit: "פרסם", back: "← חזור", price: "מחיר:" },
+            "فارسی": { login: "ورود", give: "اجاره دادن", take: "اجاره کردن", givesub: "افزودن ماشین", takesub: "جستجو", title_give: "جزئیات", title_take: "ماشین‌ها", model: "مدل", phone: "تلفن", social: "شبکه‌های اجتماعی", loc: "مکان", mon: "ماهانه ($)", year: "سالانه ($)", submit: "ثبت آگهی", back: "← بازگشت", price: "قیمت:" },
+            "Urdu": { login: "لاگ ان", give: "کرایہ پر دیں", take: "کرایہ پر لیں", givesub: "گاڑی شامل کریں", takesub: "تلاش کریں", title_give: "تفصیلات", title_take: "گاڑیاں", model: "ماڈل", phone: "فون", social: "سوشل میڈیا", loc: "مقام", mon: "ماہانہ ($)", year: "سالانہ ($)", submit: "پوسٹ کریں", back: "← واپسی", price: "قیمت:" },
+            "Bengali": { login: "লগইন", give: "ভাড়া দিন", take: "ভাড়া নিন", givesub: "গাড়ি যোগ করুন", takesub: "খুঁজুন", title_give: "বিস্তারিত", title_take: "গাড়ি", model: "মডেল", phone: "ফোন", social: "সোশ্যাল মিডিয়া", loc: "অবস্থান", mon: "মাসিক ($)", year: "বার্ষিক ($)", submit: "পোস্ট", back: "← পিছনে", price: "মূল্য:" },
+            "Swahili": { login: "Ingia", give: "Kukodisha", take: "Kodisha", givesub: "Ongeza gari", takesub: "Tafuta gari", title_give: "Maelezo", title_take: "Magari", model: "Mfano", phone: "Simu", social: "Mitandao", loc: "Eneo", mon: "Mwezi ($)", year: "Mwaka ($)", submit: "Chapisha", back: "← Rudi", price: "Bei:" },
+            "Amharic": { login: "ግባ", give: "አከራይ", take: "ተከራይ", givesub: "መኪና አክል", takesub: "ፈልግ", title_give: "ዝርዝሮች", title_take: "መኪኖች", model: "ሞዴል", phone: "ስልክ", social: "ማህበራዊ ሚዲያ", loc: "አካባቢ", mon: "በወር ($)", year: "በዓመት ($)", submit: "ለጥፍ", back: "← ተመለስ", price: "ዋጋ:" },
+            "Sinhala": { login: "පිවිසෙන්න", give: "කුලියට දෙන්න", take: "කුලියට ගන්න", givesub: "රථයක් එක් කරන්න", takesub: "සොයන්න", title_give: "විස්තර", title_take: "මෝටර් රථ", model: "මාදිලිය", phone: "දුරකථන", social: "සමාජ මාධ්‍ය", loc: "ස්ථානය", mon: "මාසික ($)", year: "වාර්ෂික ($)", submit: "පළ කරන්න", back: "← ආපසු", price: "මිල:" },
+            "Tamil": { login: "உள்நுழை", give: "வாடகைக்கு விடு", take: "வாடகைக்கு எடு", givesub: "காரை சேர்", takesub: "தேடு", title_give: "விவரங்கள்", title_take: "கார்கள்", model: "மாடல்", phone: "தொலைபேசி", social: "சமூக ஊடகங்கள்", loc: "இடம்", mon: "மாதாந்திர ($)", year: "ஆண்டு ($)", submit: "பதிவிடு", back: "← பின்", price: "விலை:" },
+            "Telugu": { login: "లాగిన్", give: "అద్దెకు ఇవ్వండి", take: "అద్దెకు తీసుకోండి", givesub: "కారును జోడించు", takesub: "వెతకండి", title_give: "వివరాలు", title_take: "కార్లు", model: "మోడల్", phone: "ఫోన్", social: "సోషల్ మీడియా", loc: "స్థానం", mon: "నెలవారీ ($)", year: "వార్షික ($)", submit: "పోస్ట్ చేయండి", back: "← వెనుకకు", price: "ధర:" },
+            "Marathi": { login: "लॉगिन", give: "भाड्याने द्या", take: "भाड्याने घ्या", givesub: "कार जोडा", takesub: "शोधा", title_give: "तपशील", title_take: "गाड्या", model: "मॉडेल", phone: "फोन", social: "सोशल मीडिया", loc: "ठिकाण", mon: "मासिक ($)", year: "वार्षिक ($)", submit: "पोस्ट करा", back: "← मागे", price: "किंमत:" }
+        };
+
+        const countries = [
+            { n: "Uzbekistan", c: "+998" }, { n: "USA", c: "+1" }, { n: "Russia", c: "+7" },
+            { n: "Turkey", c: "+90" }, { n: "Germany", c: "+49" }, { n: "UK", c: "+44" },
+            { n: "UAE", c: "+971" }, { n: "Kazakhstan", c: "+7" }, { n: "Kyrgyzstan", c: "+996" },
+            { n: "Tajikistan", c: "+992" }, { n: "S. Korea", c: "+82" }, { n: "Poland", c: "+48" },
+            { n: "France", c: "+33" }, { n: "Italy", c: "+39" }, { n: "Egypt", c: "+20" },
+            { n: "India", c: "+91" }, { n: "Japan", c: "+81" }, { n: "China", c: "+86" }
+        ];
+        let currentMode = ''; 
+
+        const overlayContent = document.getElementById('overlay-content');
+        Object.keys(translations).forEach(l => {
+            const b = document.createElement('button');
+            b.className = "action-btn"; b.innerText = l; b.onclick = () => setLang(l);
+            overlayContent.appendChild(b);
+        });
+
+        function setLang(lang) {
+            const t = translations[lang];
+            document.getElementById('txt-login').innerText = isRegistered ? userData.name.split(' ')[0] : t.login;
+            document.getElementById('txt-give').innerText = t.give;
+            document.getElementById('txt-take').innerText = t.take;
+            document.getElementById('btn-next').innerText = t.submit;
+            document.getElementById('txt-back').innerText = t.back;
+            document.getElementById('overlay-screen').style.display = "none";
+        }
+
+        function handleLogoClick() {
+            if (!isRegistered) {
+                goHome();
+                document.getElementById('overlay-screen').style.display = "flex";
+            } else {
+                goHome();
+            }
+            closeProfile();
+        }
+
+        function openProfile() { document.getElementById('profile-overlay').classList.remove('hidden'); }
+        function closeProfile() { document.getElementById('profile-overlay').classList.add('hidden'); }
+
+        function checkFile(input) {
+            const box = input.parentElement;
+            if(input.files.length > 0) { box.classList.add('filled'); box.classList.remove('error'); }
+        }
+
+        function goHome() {
+            document.querySelectorAll('input').forEach(i => { i.classList.remove('error'); });
+            document.querySelectorAll('.error-text').forEach(e => { e.style.display = 'none'; });
+            document.getElementById('form-register').classList.add('hidden');
+            document.getElementById('car-results').classList.add('hidden');
+            document.getElementById('step-choice').classList.remove('hidden');
+        }
+
+        function showRegistration(mode) {
+            currentMode = mode;
+            document.getElementById('step-choice').classList.add('hidden');
+            document.getElementById('form-register').classList.remove('hidden');
+            if(mode === 'give') document.getElementById('extra-fields').classList.remove('hidden');
+            else document.getElementById('extra-fields').classList.add('hidden');
+        }
+
+        function handleFormSubmit() {
+            let allValid = true;
+            const checks = [{id: 'inp-name', type: 'name'}, {id: 'inp-phone', type: 'phone'}];
+            if (currentMode === 'give') {
+                checks.push({id: 'inp-model', type: 'text'}, {id: 'inp-loc', type: 'text'}, {id: 'inp-mon', type: 'number'}, {id: 'inp-year', type: 'number'});
+                const mediaOk = ['file-p1', 'file-p2', 'file-p3', 'file-p4', 'file-v1'].every(id => document.getElementById(id).files.length > 0);
+                if(!mediaOk) { document.getElementById('err-media').style.display = 'block'; allValid = false; }
+            }
+
+            checks.forEach(check => {
+                const el = document.getElementById(check.id);
+                let isOk = false;
+                const val = el.value.trim();
+                if(check.type === 'text') isOk = val !== "";
+                else if(check.type === 'name') isOk = val.split(' ').length >= 2;
+                else if(check.type === 'phone') isOk = /^\d{7,15}$/.test(val);
+                else if(check.type === 'number') isOk = !isNaN(val) && parseFloat(val) > 0;
+                
+                if (!isOk) { el.classList.add('error'); el.nextElementSibling.style.display = 'block'; allValid = false; }
+                else { el.classList.remove('error'); el.nextElementSibling.style.display = 'none'; }
+            });
+
+            if(allValid) {
+                isRegistered = true;
+                userData.name = document.getElementById('inp-name').value;
+                userData.phone = document.getElementById('country-code-btn').innerText + " " + document.getElementById('inp-phone').value;
+                document.getElementById('prof-name').innerText = userData.name;
+                document.getElementById('prof-phone').innerText = userData.phone;
+                document.getElementById('txt-login').innerText = userData.name.split(' ')[0];
+                document.getElementById('guest-profile').classList.add('hidden');
+                document.getElementById('user-profile').classList.remove('hidden');
+                if(currentMode === 'take') {
+                    document.getElementById('form-register').classList.add('hidden');
+                    document.getElementById('car-results').classList.remove('hidden');
+                } else {
+                    alert("Success!");
+                    goHome();
+                }
+            }
+        }
+
+        function goBack() { goHome(); }
+        function openCountryPicker() { document.getElementById('country-overlay').classList.remove('hidden'); }
+        function closeCountryPicker() { document.getElementById('country-overlay').classList.add('hidden'); }
+        function selectCountry(code) { document.getElementById('country-code-btn').innerText = code; closeCountryPicker(); }
+        
+        const Country = [{n:"Uzbekistan",c:"+998"},{n:"USA",c:"+1"},{n:"UAE",c:"+971"}];
+        const countryContent = document.getElementById('country-content');
+        countries.forEach(country => {
+            const b = document.createElement('button');
+            b.className = "action-btn";
+            b.innerHTML = `<b>${country.c}</b><br><small>${country.n}</small>`;
+            b.onclick = () => selectCountry(country.c);
+            countryContent.appendChild(b);
+        });
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</body>
+</html>
