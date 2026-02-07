@@ -1,713 +1,175 @@
 ---
-import Layout from "../layouts/Layout.astro";
+/* Astro frontmatter bo‘sh */
 ---
 
-<Layout title="TEMURrentUZ - Global Auto Rental">
-  <style is:global>
-    :root {
-      --primary: #3b82f6;
-      --secondary: #10b981;
-      --dark: #070b14;
-      --card-bg: rgba(255, 255, 255, 0.06);
-      --border: rgba(255, 255, 255, 0.1);
-      --error: #ef4444;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Inter, sans-serif; }
-    body { background: radial-gradient(circle at top right, #1e293b, #070b14); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <title>TEMURrentUZ – Car Rental</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    #overlay-screen, #country-overlay, #profile-overlay {
-      position: fixed; inset: 0; background: var(--dark); z-index: 1000;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    #profile-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(15px); z-index: 1200; }
-    #country-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(10px); z-index: 1100; }
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-    .scroll-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px; max-width: 1000px; width: 90%; margin-top: 20px;
-      max-height: 70vh; overflow-y: auto; padding: 20px;
+  <style>
+    :root{
+      --primary:#3b82f6;
+      --dark:#070b14;
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
     }
-    .action-btn {
-      padding: 12px; background: var(--card-bg); border: 1px solid var(--border);
-      color: white; border-radius: 12px; cursor: pointer; transition: 0.3s;
-      font-size: 14px; text-align: center;
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+    body{
+      background:radial-gradient(circle at top right,#1e293b,#070b14);
+      color:#fff;min-height:100vh
     }
-    .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
-
-    header { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
-      background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+    header{
+      padding:18px 6%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid var(--border)
     }
-
-    .logo {
-      font-size: 26px; font-weight: 900;
-      background: linear-gradient(to right, #3b82f6, #60a5fa);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent; color: transparent;
-      display: inline-block; cursor: pointer;
+    .logo{font-size:26px;font-weight:900;color:var(--primary)}
+    .container{max-width:900px;margin:40px auto;padding:20px}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:28px;
+      margin-bottom:28px
     }
-
-    .profile-trigger { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 20px; transition: 0.3s; }
-    .profile-trigger:hover { background: var(--card-bg); }
-
-    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-    .card { background: var(--card-bg); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 30px; padding: 35px; }
-
-    .choice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .choice-card { padding: 40px 20px; text-align: center; border-radius: 25px; cursor: pointer; transition: 0.4s;
-      border: 1px solid var(--border); background: var(--card-bg);
+    input,button{
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#0f172a;
+      color:white;
+      margin-bottom:14px
     }
-    .choice-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-
-    .input-group { margin-bottom: 15px; position: relative; }
-    input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.6); color: white; outline: none; transition: 0.3s;
+    button{
+      background:var(--primary);
+      font-weight:700;
+      cursor:pointer
     }
-    input.error { border-color: var(--error); box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
-    .error-text { color: var(--error); font-size: 11px; margin-top: 4px; display: none; }
-
-    .media-upload { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; margin-bottom: 5px; }
-    .media-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: 10px; height: 60px;
-      display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; position: relative; transition: 0.3s;
+    .hidden{display:none}
+    .cars{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:20px
     }
-    .media-box.error { border-color: var(--error); }
-    .media-box.filled { border-color: var(--secondary); color: var(--secondary); }
-
-    .hidden { display: none !important; }
-    .btn-submit { width: 100%; padding: 16px; background: var(--primary); border: none; color: white; font-weight: bold;
-      border-radius: 15px; cursor: pointer; font-size: 16px; margin-top: 10px;
+    .car{
+      background:rgba(255,255,255,.05);
+      padding:18px;
+      border-radius:18px;
+      border:1px solid var(--border)
     }
-
-    .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 320px; text-align: center; }
-    .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 15px; }
-    .menu-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: 0.2s; text-align: left; width: 100%; background: none; color: white; border: none;
-    }
-    .menu-item:hover { background: rgba(255,255,255,0.05); }
   </style>
+</head>
 
-  <div id="overlay-screen">
-    <div class="logo" style="margin-bottom: 20px; font-size: 32px;">TEMURrentUZ</div>
-    <h2 id="overlay-title">Select Language</h2>
-    <div class="scroll-grid" id="overlay-content"></div>
+<body>
+
+<header>
+  <div class="logo">TEMURrentUZ</div>
+  <div id="userLabel">Guest</div>
+</header>
+
+<div class="container">
+
+  <!-- REGISTER -->
+  <div class="card" id="registerBox">
+    <h2>Ro‘yxatdan o‘tish</h2>
+    <input id="name" placeholder="Ism Familiya">
+    <input id="phone" placeholder="Telefon">
+    <button onclick="register()">Davom etish</button>
   </div>
 
-  <div id="country-overlay" class="hidden">
-    <h2>Select Country</h2>
-    <div class="scroll-grid" id="country-content"></div>
-    <button id="btn-cancel-country" class="action-btn" style="margin-top: 20px; background: #ef4444;">Cancel</button>
+  <!-- ADD CAR -->
+  <div class="card hidden" id="addCarBox">
+    <h2>Mashina qo‘shish</h2>
+    <input id="model" placeholder="Model">
+    <input id="location" placeholder="Joylashuv">
+    <input id="price" placeholder="Narx ($/kun)">
+    <button onclick="addCar()">Joylash</button>
   </div>
 
-  <div id="profile-overlay" class="hidden">
-    <div class="profile-menu-card">
-      <div id="guest-profile">
-        <div class="profile-avatar" style="background: #64748b;"><i class="fas fa-user-secret"></i></div>
-        <h3>Guest Mode</h3>
-        <p style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">You are not logged in</p>
-        <button class="menu-item" id="btn-go-login"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
-        <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
-      </div>
-
-      <div id="user-profile" class="hidden">
-        <div class="profile-avatar"><i class="fas fa-user"></i></div>
-        <h3 id="prof-name">User Name</h3>
-        <p id="prof-phone" style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">+998 00 000 00 00</p>
-        <button class="menu-item"><i class="fas fa-shield-alt"></i> Security & Privacy</button>
-        <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
-        <button class="menu-item" style="color: #ef4444;" id="btn-logout"><i class="fas fa-power-off"></i> Logout</button>
-      </div>
-
-      <button class="action-btn" id="btn-close-profile" style="margin-top: 20px; width: 100%;">Close</button>
-    </div>
+  <!-- LIST -->
+  <div class="card hidden" id="carsBox">
+    <h2>Mavjud mashinalar</h2>
+    <div class="cars" id="cars"></div>
   </div>
 
-  <header>
-    <div class="logo" id="logo-btn">TEMURrentUZ</div>
-    <div class="profile-trigger" id="profile-open">
-      <i class="fas fa-user-circle fa-lg"></i>
-      <span id="txt-login">Login</span>
-    </div>
-  </header>
+</div>
 
-  <div class="container">
-    <div id="step-choice" class="choice-btns">
-      <div class="choice-card" id="btn-give">
-        <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
-        <h3 id="txt-give">Rent Out</h3>
-        <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
-      </div>
-      <div class="choice-card" id="btn-take">
-        <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
-        <h3 id="txt-take">Rent In</h3>
-        <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
-      </div>
-    </div>
+<!-- Supabase CDN (MUHIM) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <div id="form-register" class="card hidden">
-      <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
+<script>
+  /* 🔴 SHU YERNI O‘ZGARTIR 🔴 */
+  const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";
 
-      <div class="input-group">
-        <input type="text" id="inp-name" placeholder="Full Name (e.g. John Doe)" />
-        <div class="error-text">Invalid name (Enter first and last name)</div>
-      </div>
+  const supabase = supabaseJs.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button id="country-code-btn" style="flex: 0.35; height: 50px;" class="action-btn">+998</button>
-        <div class="input-group" style="flex: 1; margin-bottom: 0;">
-          <input type="text" id="inp-phone" placeholder="Phone (901234567)" />
-          <div class="error-text">Invalid phone number</div>
-        </div>
-      </div>
+  let currentUser = null;
 
-      <div id="extra-fields" class="hidden">
-        <div class="input-group"><input type="text" id="inp-model" placeholder="Car Model" /><div class="error-text">Model required</div></div>
-        <div class="input-group"><input type="text" id="inp-loc" placeholder="Location" /><div class="error-text">Location required</div></div>
-        <div style="display: flex; gap: 10px;">
-          <div class="input-group" style="flex:1"><input type="number" id="inp-mon" placeholder="Monthly ($)" /><div class="error-text">Invalid price</div></div>
-          <div class="input-group" style="flex:1"><input type="number" id="inp-year" placeholder="Yearly ($)" /><div class="error-text">Invalid price</div></div>
-        </div>
+  async function register(){
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
 
-        <div class="media-upload">
-          <div class="media-box" id="box-p1"><i class="fas fa-camera"></i><input type="file" id="file-p1" class="hidden" /></div>
-          <div class="media-box" id="box-p2"><i class="fas fa-camera"></i><input type="file" id="file-p2" class="hidden" /></div>
-          <div class="media-box" id="box-p3"><i class="fas fa-camera"></i><input type="file" id="file-p3" class="hidden" /></div>
-          <div class="media-box" id="box-p4"><i class="fas fa-camera"></i><input type="file" id="file-p4" class="hidden" /></div>
-          <div class="media-box" id="box-v1" style="border-style: solid;"><i class="fas fa-video"></i><input type="file" id="file-v1" class="hidden" /></div>
-        </div>
-
-        <div class="error-text" id="err-media" style="margin-bottom: 15px;">Please upload all 4 photos and 1 video</div>
-      </div>
-
-      <button class="btn-submit" id="btn-next">Continue</button>
-      <p id="txt-back" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;">← Back</p>
-    </div>
-
-    <div id="car-results" class="hidden">
-      <h2 id="txt-title-take">Available Cars</h2>
-      <div class="car-grid"><div class="car-item"><h3>Chevrolet Tahoe</h3><p>$1200/mo</p></div></div>
-    </div>
-  </div>
-<script is:inline>
-  <script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-  const supabaseUrl = "https://XXXX.supabase.co";
-  const supabaseKey = "PUBLIC_ANON_KEY";
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  console.log("Supabase ishlayapti ✅", supabase);
-</script>
-
-  (() => {
-    // --------- Supabase init (ENV dan oladi) ----------
-    const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
-    const SUPABASE_ANON = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!SUPABASE_URL || !SUPABASE_ANON) {
-      alert("ENV xato: PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_ANON_KEY yo‘q!");
-      console.error("Missing ENV");
+    if(!name || !phone){
+      alert("Ma'lumotlarni to‘ldir");
       return;
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+    currentUser = { name, phone };
+    document.getElementById("userLabel").innerText = name;
 
-    // --------- Helpers ----------
-    const $ = (id) => document.getElementById(id);
-    const fmt = (n) => (Number.isFinite(n) ? n.toFixed(2) : n);
+    document.getElementById("registerBox").classList.add("hidden");
+    document.getElementById("addCarBox").classList.remove("hidden");
+    document.getElementById("carsBox").classList.remove("hidden");
 
-    function haversineKm(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) ** 2;
-      return 2 * R * Math.asin(Math.sqrt(a));
+    loadCars();
+  }
+
+  async function addCar(){
+    const model = document.getElementById("model").value;
+    const location = document.getElementById("location").value;
+    const price = document.getElementById("price").value;
+
+    const { error } = await supabase
+      .from("cars")
+      .insert([{ model, location, price }]);
+
+    if(error){
+      alert(error.message);
+    }else{
+      alert("Mashina qo‘shildi ✅");
+      loadCars();
     }
+  }
 
-    // --------- Region list (UZ) ----------
-    const UZ_REGIONS = [
-      "Toshkent", "Toshkent viloyati", "Andijon", "Namangan", "Farg‘ona",
-      "Samarqand", "Buxoro", "Navoiy", "Qashqadaryo", "Surxondaryo",
-      "Jizzax", "Sirdaryo", "Xorazm", "Qoraqalpog‘iston"
-    ];
+  async function loadCars(){
+    const { data } = await supabase.from("cars").select("*");
+    const box = document.getElementById("cars");
+    box.innerHTML = "";
 
-    // --------- UI inject (minimal) ----------
-    // Biz mavjud layoutni buzmaymiz: container ichiga dashboard qo‘shamiz.
-    const container = document.querySelector(".container");
-    const dash = document.createElement("div");
-    dash.id = "dash";
-    dash.className = "card hidden";
-    dash.style.marginTop = "20px";
-    dash.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-        <div>
-          <h2 style="margin-bottom:6px;">Dashboard</h2>
-          <div style="opacity:.7; font-size:12px;" id="whoami">Guest</div>
+    data?.forEach(car=>{
+      box.innerHTML += `
+        <div class="car">
+          <h3>${car.model}</h3>
+          <p>${car.location}</p>
+          <b>$${car.price} / kun</b>
         </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="action-btn" id="btn-google">Login with Google</button>
-          <button class="action-btn hidden" id="btn-logout2" style="background:#ef4444;">Logout</button>
-        </div>
-      </div>
-
-      <hr style="border:0; border-top:1px solid rgba(255,255,255,.08); margin:18px 0;" />
-
-      <div id="location-step" class="hidden">
-        <h3 style="margin-bottom:10px;">Location (Country → Region)</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div>
-            <div style="font-size:12px; opacity:.7; margin-bottom:6px;">Country</div>
-            <select id="sel-country" style="width:100%; padding:12px; border-radius:12px; background:rgba(15,23,42,.6); color:white; border:1px solid rgba(255,255,255,.1);">
-              <option value="Uzbekistan">Uzbekistan</option>
-              <option value="USA">USA</option>
-              <option value="Turkey">Turkey</option>
-              <option value="Germany">Germany</option>
-            </select>
-          </div>
-          <div>
-            <div style="font-size:12px; opacity:.7; margin-bottom:6px;">Region</div>
-            <select id="sel-region" style="width:100%; padding:12px; border-radius:12px; background:rgba(15,23,42,.6); color:white; border:1px solid rgba(255,255,255,.1);"></select>
-          </div>
-        </div>
-        <button class="btn-submit" id="btn-save-loc" style="margin-top:12px;">Save location</button>
-      </div>
-
-      <div id="add-car" class="hidden" style="margin-top:18px;">
-        <h3 style="margin-bottom:10px;">Rent Out — Add Car</h3>
-
-        <div class="input-group"><input id="car-title" placeholder="Title (e.g. Malibu 2)" /></div>
-        <div class="input-group"><input id="car-model" placeholder="Model" /></div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div class="input-group"><input id="car-city" placeholder="City (optional)" /></div>
-          <div class="input-group"><input id="car-price" type="number" placeholder="Price per day ($)" /></div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div class="input-group"><input id="car-from" type="date" /></div>
-          <div class="input-group"><input id="car-to" type="date" /></div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div class="input-group"><input id="car-lat" placeholder="Latitude (e.g. 41.311)" /></div>
-          <div class="input-group"><input id="car-lng" placeholder="Longitude (e.g. 69.279)" /></div>
-        </div>
-
-        <p style="font-size:12px; opacity:.7; margin:6px 0 10px;">
-          Tip: lat/lng uchun Google Maps → right click → “What’s here?” → koordinata.
-        </p>
-
-        <button class="btn-submit" id="btn-add-car">Publish car</button>
-        <div id="addcar-msg" style="margin-top:10px; font-size:12px; opacity:.8;"></div>
-      </div>
-
-      <div id="nearby" class="hidden" style="margin-top:18px;">
-        <h3 style="margin-bottom:10px;">Nearest cars</h3>
-        <div id="cars-list" style="display:grid; gap:12px;"></div>
-
-        <h3 style="margin:18px 0 10px;">Map</h3>
-        <div id="map" style="height:340px; border-radius:18px; border:1px solid rgba(255,255,255,.1); overflow:hidden;"></div>
-      </div>
-
-      <div id="my-bookings" class="hidden" style="margin-top:18px;">
-        <h3 style="margin-bottom:10px;">Bookings (My / For my cars)</h3>
-        <div id="bookings-list" style="display:grid; gap:12px;"></div>
-      </div>
-    `;
-    container.appendChild(dash);
-
-    // Leaflet CDN (map uchun)
-    const leafletCss = document.createElement("link");
-    leafletCss.rel = "stylesheet";
-    leafletCss.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(leafletCss);
-
-    const leafletJs = document.createElement("script");
-    leafletJs.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    document.body.appendChild(leafletJs);
-
-    // --------- State ----------
-    let session = null;
-    let profile = {
-      country: "Uzbekistan",
-      region: "Toshkent",
-      lat: null,
-      lng: null,
-    };
-
-    let map = null;
-    let markers = [];
-
-    function setRegions() {
-      const country = $("sel-country").value;
-      const sel = $("sel-region");
-      sel.innerHTML = "";
-
-      const regions = country === "Uzbekistan" ? UZ_REGIONS : ["Default"];
-      regions.forEach(r => {
-        const opt = document.createElement("option");
-        opt.value = r;
-        opt.textContent = r;
-        sel.appendChild(opt);
-      });
-
-      if (country === "Uzbekistan") sel.value = "Toshkent";
-    }
-
-    function showDash() {
-      $("dash").classList.remove("hidden");
-    }
-
-    function setAuthUI(isAuthed) {
-      $("btn-google").classList.toggle("hidden", isAuthed);
-      $("btn-logout2").classList.toggle("hidden", !isAuthed);
-      $("location-step").classList.toggle("hidden", !isAuthed);
-      $("add-car").classList.toggle("hidden", !isAuthed);
-      $("nearby").classList.toggle("hidden", !isAuthed);
-      $("my-bookings").classList.toggle("hidden", !isAuthed);
-
-      if (!isAuthed) {
-        $("whoami").textContent = "Guest (login kerak)";
-      }
-    }
-
-    // --------- Auth ----------
-    async function refreshSession() {
-      const { data } = await supabase.auth.getSession();
-      session = data.session;
-
-      setAuthUI(!!session);
-
-      if (session?.user) {
-        const u = session.user;
-        $("whoami").textContent = `Logged: ${u.email || u.id}`;
-        // default: location step ko‘rsat
-        $("location-step").classList.remove("hidden");
-        setRegions();
-
-        // geolocation (yaqin mashinalar uchun)
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((pos) => {
-            profile.lat = pos.coords.latitude;
-            profile.lng = pos.coords.longitude;
-            // avtomatik refresh
-            loadCarsNearby();
-            loadBookings();
-          }, () => {
-            // user ruxsat bermasa ham ishlayveradi
-            loadCarsNearby();
-            loadBookings();
-          });
-        } else {
-          loadCarsNearby();
-          loadBookings();
-        }
-      }
-    }
-
-    $("btn-google").onclick = async () => {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin }
-      });
-      if (error) alert(error.message);
-    };
-
-    $("btn-logout2").onclick = async () => {
-      await supabase.auth.signOut();
-      location.reload();
-    };
-
-    // --------- Location step ----------
-    $("sel-country").onchange = setRegions;
-    setRegions();
-
-    $("btn-save-loc").onclick = async () => {
-      profile.country = $("sel-country").value;
-      profile.region = $("sel-region").value;
-
-      // location saqlashni hozir localStorage’ga qilamiz (tez)
-      localStorage.setItem("temur_location", JSON.stringify({
-        country: profile.country,
-        region: profile.region
-      }));
-
-      $("location-step").classList.add("hidden");
-      loadCarsNearby();
-      loadBookings();
-    };
-
-    // old location
-    try {
-      const saved = JSON.parse(localStorage.getItem("temur_location") || "null");
-      if (saved?.country && saved?.region) {
-        profile.country = saved.country;
-        profile.region = saved.region;
-        $("sel-country").value = profile.country;
-        setRegions();
-        $("sel-region").value = profile.region;
-      }
-    } catch {}
-
-    // --------- Add car ----------
-    $("btn-add-car").onclick = async () => {
-      if (!session?.user) return alert("Login kerak!");
-
-      const owner = session.user.id;
-      const title = $("car-title").value.trim();
-      const model = $("car-model").value.trim();
-      const city = $("car-city").value.trim();
-      const price = Number($("car-price").value);
-      const from = $("car-from").value;
-      const to = $("car-to").value;
-      const lat = Number($("car-lat").value);
-      const lng = Number($("car-lng").value);
-
-      if (!title || !model) return alert("Title + Model kerak");
-      if (!from || !to) return alert("Available dates kerak");
-      if (!Number.isFinite(price) || price <= 0) return alert("Price xato");
-      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return alert("lat/lng xato");
-
-      const payload = {
-        owner,
-        title,
-        model,
-        country: profile.country,
-        region: profile.region,
-        city: city || null,
-        lat,
-        lng,
-        price_daily: price,
-        available_from: from,
-        available_to: to,
-      };
-
-      const { error } = await supabase.from("cars2").insert(payload);
-      if (error) {
-        console.error(error);
-        $("addcar-msg").textContent = "Xato: " + error.message;
-        return;
-      }
-
-      $("addcar-msg").textContent = "✅ Car published!";
-      $("car-title").value = "";
-      $("car-model").value = "";
-      $("car-city").value = "";
-      $("car-price").value = "";
-      $("car-from").value = "";
-      $("car-to").value = "";
-      $("car-lat").value = "";
-      $("car-lng").value = "";
-
-      await loadCarsNearby();
-    };
-
-    // --------- Cars nearby + map ----------
-    async function loadCarsNearby() {
-      if (!session?.user) return;
-
-      const { data, error } = await supabase
-        .from("cars2")
-        .select("*")
-        .eq("is_active", true)
-        .eq("country", profile.country)
-        .eq("region", profile.region)
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      let cars = data || [];
-
-      // nearest sort (geolocation bo‘lsa)
-      if (Number.isFinite(profile.lat) && Number.isFinite(profile.lng)) {
-        cars = cars
-          .map(c => ({ ...c, _km: haversineKm(profile.lat, profile.lng, c.lat, c.lng) }))
-          .sort((a, b) => (a._km ?? 99999) - (b._km ?? 99999));
-      }
-
-      // list render
-      const list = $("cars-list");
-      list.innerHTML = "";
-
-      cars.forEach(c => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.style.padding = "16px";
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div>
-              <b style="font-size:16px;">${c.title}</b>
-              <div style="opacity:.75; font-size:12px; margin-top:4px;">
-                ${c.model} • ${c.country}, ${c.region}${c.city ? ", " + c.city : ""}
-              </div>
-              <div style="opacity:.75; font-size:12px; margin-top:6px;">
-                Available: <b>${c.available_from}</b> → <b>${c.available_to}</b>
-                ${c._km != null ? ` • Distance: <b>${fmt(c._km)} km</b>` : ""}
-              </div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:18px;"><b>$${c.price_daily}</b><span style="opacity:.7; font-size:12px;"> /day</span></div>
-              <button class="action-btn" data-book="${c.id}" style="margin-top:10px;">Book</button>
-            </div>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-
-      // book buttons
-      list.querySelectorAll("[data-book]").forEach(btn => {
-        btn.onclick = async () => {
-          const carId = btn.getAttribute("data-book");
-          const start = prompt("Start date (YYYY-MM-DD)?");
-          const end = prompt("End date (YYYY-MM-DD)?");
-          if (!start || !end) return;
-
-          const { error } = await supabase.from("bookings").insert({
-            car_id: carId,
-            renter: session.user.id,
-            start_date: start,
-            end_date: end,
-            status: "requested",
-          });
-
-          if (error) {
-            alert("Booking xato: " + error.message);
-            return;
-          }
-          alert("✅ Booking sent (requested)!");
-          loadBookings();
-        };
-      });
-
-      // Map init (Leaflet yuklangandan keyin)
-      const waitLeaflet = () => new Promise((res) => {
-        const t = setInterval(() => {
-          if (window.L) { clearInterval(t); res(true); }
-        }, 50);
-      });
-
-      await waitLeaflet();
-
-      if (!map) {
-        map = L.map("map").setView(
-          Number.isFinite(profile.lat) ? [profile.lat, profile.lng] : [41.311, 69.279],
-          11
-        );
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: "© OpenStreetMap"
-        }).addTo(map);
-      }
-
-      // clear markers
-      markers.forEach(m => m.remove());
-      markers = [];
-
-      // user marker
-      if (Number.isFinite(profile.lat) && Number.isFinite(profile.lng)) {
-        const me = L.marker([profile.lat, profile.lng]).addTo(map).bindPopup("You are here");
-        markers.push(me);
-      }
-
-      cars.forEach(c => {
-        const m = L.marker([c.lat, c.lng])
-          .addTo(map)
-          .bindPopup(`<b>${c.title}</b><br>${c.model}<br>$${c.price_daily}/day`);
-        markers.push(m);
-      });
-    }
-
-    // --------- Bookings (renter + owner) ----------
-    async function loadBookings() {
-      if (!session?.user) return;
-
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*, cars2:car_id (title, model, owner)")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      const list = $("bookings-list");
-      list.innerHTML = "";
-
-      (data || []).forEach(b => {
-        const car = b.cars2;
-        const isOwner = car?.owner === session.user.id;
-
-        const card = document.createElement("div");
-        card.className = "card";
-        card.style.padding = "14px";
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div>
-              <b>${car?.title || "Car"}</b> <span style="opacity:.7;">(${car?.model || ""})</span>
-              <div style="opacity:.75; font-size:12px; margin-top:4px;">
-                ${b.start_date} → ${b.end_date} • status: <b>${b.status}</b>
-              </div>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-              ${isOwner && b.status === "requested" ? `
-                <button class="action-btn" data-approve="${b.id}" style="background:rgba(16,185,129,.25);">Approve</button>
-                <button class="action-btn" data-reject="${b.id}" style="background:rgba(239,68,68,.25);">Reject</button>
-              ` : ""}
-              ${(!isOwner && (b.status === "requested" || b.status === "approved")) ? `
-                <button class="action-btn" data-cancel="${b.id}" style="background:rgba(239,68,68,.25);">Cancel</button>
-              ` : ""}
-            </div>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-
-      // actions
-      list.querySelectorAll("[data-approve]").forEach(btn => {
-        btn.onclick = async () => {
-          const id = btn.getAttribute("data-approve");
-          const { error } = await supabase.from("bookings").update({ status: "approved" }).eq("id", id);
-          if (error) return alert(error.message);
-          loadBookings();
-        };
-      });
-
-      list.querySelectorAll("[data-reject]").forEach(btn => {
-        btn.onclick = async () => {
-          const id = btn.getAttribute("data-reject");
-          const { error } = await supabase.from("bookings").update({ status: "rejected" }).eq("id", id);
-          if (error) return alert(error.message);
-          loadBookings();
-        };
-      });
-
-      list.querySelectorAll("[data-cancel]").forEach(btn => {
-        btn.onclick = async () => {
-          const id = btn.getAttribute("data-cancel");
-          const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
-          if (error) return alert(error.message);
-          loadBookings();
-        };
-      });
-    }
-
-    // --------- Start ----------
-    showDash();
-
-    supabase.auth.onAuthStateChange(() => {
-      refreshSession();
+      `;
     });
-
-    refreshSession();
-  })();
+  }
 </script>
 
-</Layout>
+</body>
+</html>
