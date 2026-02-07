@@ -1,452 +1,354 @@
 ---
+import Layout from "../layouts/Layout.astro";
 ---
 
-<style>
-  :root {
-    --primary: #3b82f6;
-    --secondary: #10b981;
-    --dark: #070b14;
-    --card-bg: rgba(255, 255, 255, 0.06);
-    --border: rgba(255, 255, 255, 0.1);
-    --error: #ef4444;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: Inter, system-ui, Arial, sans-serif; }
-  body { background: radial-gradient(circle at top right, #1e293b, #070b14); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
+<Layout title="TEMURrentUZ - Global Auto Rental">
+  <style is:global>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #10b981;
+      --dark: #070b14;
+      --card-bg: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.1);
+      --error: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Inter, sans-serif; }
+    body { background: radial-gradient(circle at top right, #1e293b, #070b14); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
 
-  #overlay-screen, #country-overlay, #profile-overlay {
-    position: fixed; inset: 0; background: var(--dark); z-index: 1000;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-  #profile-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(15px); z-index: 1200; }
-  #country-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(10px); z-index: 1100; }
+    #overlay-screen, #country-overlay, #profile-overlay {
+      position: fixed; inset: 0; background: var(--dark); z-index: 1000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    #profile-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(15px); z-index: 1200; }
+    #country-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(10px); z-index: 1100; }
 
-  .scroll-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 15px; max-width: 1000px; width: 90%; margin-top: 20px;
-    max-height: 70vh; overflow-y: auto; padding: 20px;
-  }
-  .action-btn {
-    padding: 12px; background: var(--card-bg); border: 1px solid var(--border);
-    color: white; border-radius: 12px; cursor: pointer; transition: 0.3s;
-    font-size: 14px; text-align: center;
-  }
-  .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
+    .scroll-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px; max-width: 1000px; width: 90%; margin-top: 20px;
+      max-height: 70vh; overflow-y: auto; padding: 20px;
+    }
+    .action-btn {
+      padding: 12px; background: var(--card-bg); border: 1px solid var(--border);
+      color: white; border-radius: 12px; cursor: pointer; transition: 0.3s;
+      font-size: 14px; text-align: center;
+    }
+    .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
 
-  header {
-    padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
-    background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px);
-    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
-  }
+    header { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
+      background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+    }
 
-  .logo {
-    font-size: 26px; font-weight: 900;
-    background: linear-gradient(to right, #3b82f6, #60a5fa);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; color: transparent;
-    display: inline-block; cursor: pointer;
-  }
+    .logo {
+      font-size: 26px; font-weight: 900;
+      background: linear-gradient(to right, #3b82f6, #60a5fa);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      display: inline-block; cursor: pointer;
+    }
 
-  .profile-trigger { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 20px; transition: 0.3s; }
-  .profile-trigger:hover { background: var(--card-bg); }
+    .profile-trigger { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 20px; transition: 0.3s; }
+    .profile-trigger:hover { background: var(--card-bg); }
 
-  .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-  .card { background: var(--card-bg); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 30px; padding: 35px; animation: fadeIn 0.5s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .card { background: var(--card-bg); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 30px; padding: 35px; }
 
-  .choice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .choice-card { padding: 40px 20px; text-align: center; border-radius: 25px; cursor: pointer; transition: 0.4s; border: 1px solid var(--border); background: var(--card-bg); }
-  .choice-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+    .choice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .choice-card { padding: 40px 20px; text-align: center; border-radius: 25px; cursor: pointer; transition: 0.4s;
+      border: 1px solid var(--border); background: var(--card-bg);
+    }
+    .choice-card:hover { border-color: var(--primary); transform: translateY(-5px); }
 
-  .input-group { margin-bottom: 15px; position: relative; }
-  input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; transition: 0.3s; }
-  input.error { border-color: var(--error); box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
-  .error-text { color: var(--error); font-size: 11px; margin-top: 4px; display: none; }
+    .input-group { margin-bottom: 15px; position: relative; }
+    input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.6); color: white; outline: none; transition: 0.3s;
+    }
+    input.error { border-color: var(--error); box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+    .error-text { color: var(--error); font-size: 11px; margin-top: 4px; display: none; }
 
-  .media-upload { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; margin-bottom: 5px; }
-  .media-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: 10px; height: 60px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; position: relative; transition: 0.3s; }
-  .media-box.error { border-color: var(--error); }
-  .media-box.filled { border-color: var(--secondary); color: var(--secondary); }
+    .media-upload { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; margin-bottom: 5px; }
+    .media-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: 10px; height: 60px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; position: relative; transition: 0.3s;
+    }
+    .media-box.error { border-color: var(--error); }
+    .media-box.filled { border-color: var(--secondary); color: var(--secondary); }
 
-  .hidden { display: none !important; }
-  .btn-submit { width: 100%; padding: 16px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 15px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+    .hidden { display: none !important; }
+    .btn-submit { width: 100%; padding: 16px; background: var(--primary); border: none; color: white; font-weight: bold;
+      border-radius: 15px; cursor: pointer; font-size: 16px; margin-top: 10px;
+    }
 
-  .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 320px; text-align: center; }
-  .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 15px; }
-  .menu-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; text-align: left; width: 100%; background: none; color: white; border: none; }
-  .menu-item:hover { background: rgba(255,255,255,0.05); }
-</style>
+    .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 320px; text-align: center; }
+    .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 15px; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: 0.2s; text-align: left; width: 100%; background: none; color: white; border: none;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.05); }
+  </style>
 
-<!-- Overlay Language -->
-<div id="overlay-screen">
-  <div class="logo" style="margin-bottom: 20px; font-size: 32px;">TEMURrentUZ</div>
-  <h2 id="overlay-title">Select Language</h2>
-  <div class="scroll-grid" id="overlay-content"></div>
-</div>
-
-<!-- Country picker -->
-<div id="country-overlay" class="hidden">
-  <h2>Select Country</h2>
-  <div class="scroll-grid" id="country-content"></div>
-  <button id="btn-cancel-country" class="action-btn" style="margin-top: 20px; background: #ef4444;">Cancel</button>
-</div>
-
-<!-- Profile -->
-<div id="profile-overlay" class="hidden">
-  <div class="profile-menu-card">
-    <div id="guest-profile">
-      <div class="profile-avatar" style="background: #64748b;"><i class="fas fa-user-secret"></i></div>
-      <h3>Guest Mode</h3>
-      <p style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">You are not logged in</p>
-      <button class="menu-item" id="btn-profile-home"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
-      <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
-    </div>
-
-    <div id="user-profile" class="hidden">
-      <div class="profile-avatar"><i class="fas fa-user"></i></div>
-      <h3 id="prof-name">User Name</h3>
-      <p id="prof-phone" style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">+998 00 000 00 00</p>
-      <button class="menu-item"><i class="fas fa-shield-alt"></i> Security & Privacy</button>
-      <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
-      <button class="menu-item" style="color: #ef4444;" id="btn-logout"><i class="fas fa-power-off"></i> Logout</button>
-    </div>
-
-    <button class="action-btn" id="btn-close-profile" style="margin-top: 20px; width: 100%;">Close</button>
+  <div id="overlay-screen">
+    <div class="logo" style="margin-bottom: 20px; font-size: 32px;">TEMURrentUZ</div>
+    <h2 id="overlay-title">Select Language</h2>
+    <div class="scroll-grid" id="overlay-content"></div>
   </div>
-</div>
 
-<header>
-  <div class="logo" id="logo-btn">TEMURrentUZ</div>
-  <div class="profile-trigger" id="profile-trigger">
-    <i class="fas fa-user-circle fa-lg"></i>
-    <span id="txt-login">Login</span>
+  <div id="country-overlay" class="hidden">
+    <h2>Select Country</h2>
+    <div class="scroll-grid" id="country-content"></div>
+    <button id="btn-cancel-country" class="action-btn" style="margin-top: 20px; background: #ef4444;">Cancel</button>
   </div>
-</header>
 
-<div class="container">
-  <div id="step-choice" class="choice-btns">
-    <div class="choice-card" id="btn-give">
-      <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
-      <h3 id="txt-give">Rent Out</h3>
-      <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
-    </div>
+  <div id="profile-overlay" class="hidden">
+    <div class="profile-menu-card">
+      <div id="guest-profile">
+        <div class="profile-avatar" style="background: #64748b;"><i class="fas fa-user-secret"></i></div>
+        <h3>Guest Mode</h3>
+        <p style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">You are not logged in</p>
+        <button class="menu-item" id="btn-go-login"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
+        <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
+      </div>
 
-    <div class="choice-card" id="btn-take">
-      <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
-      <h3 id="txt-take">Rent In</h3>
-      <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
+      <div id="user-profile" class="hidden">
+        <div class="profile-avatar"><i class="fas fa-user"></i></div>
+        <h3 id="prof-name">User Name</h3>
+        <p id="prof-phone" style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">+998 00 000 00 00</p>
+        <button class="menu-item"><i class="fas fa-shield-alt"></i> Security & Privacy</button>
+        <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
+        <button class="menu-item" style="color: #ef4444;" id="btn-logout"><i class="fas fa-power-off"></i> Logout</button>
+      </div>
+
+      <button class="action-btn" id="btn-close-profile" style="margin-top: 20px; width: 100%;">Close</button>
     </div>
   </div>
 
-  <div id="form-register" class="card hidden">
-    <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
-
-    <div class="input-group">
-      <input type="text" id="inp-name" placeholder="Full Name (e.g. John Doe)">
-      <div class="error-text">Invalid name (Enter first and last name)</div>
+  <header>
+    <div class="logo" id="logo-btn">TEMURrentUZ</div>
+    <div class="profile-trigger" id="profile-open">
+      <i class="fas fa-user-circle fa-lg"></i>
+      <span id="txt-login">Login</span>
     </div>
+  </header>
 
-    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-      <button id="country-code-btn" style="flex: 0.35; height: 50px;" class="action-btn">+998</button>
-      <div class="input-group" style="flex: 1; margin-bottom: 0;">
-        <input type="text" id="inp-phone" placeholder="Phone (901234567)">
-        <div class="error-text">Invalid phone number</div>
+  <div class="container">
+    <div id="step-choice" class="choice-btns">
+      <div class="choice-card" id="btn-give">
+        <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+        <h3 id="txt-give">Rent Out</h3>
+        <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
+      </div>
+      <div class="choice-card" id="btn-take">
+        <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
+        <h3 id="txt-take">Rent In</h3>
+        <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
       </div>
     </div>
 
-    <div id="extra-fields" class="hidden">
-      <div class="input-group">
-        <input type="text" id="inp-model" placeholder="Car Model">
-        <div class="error-text">Model required</div>
-      </div>
+    <div id="form-register" class="card hidden">
+      <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
 
       <div class="input-group">
-        <input type="text" id="inp-loc" placeholder="Location">
-        <div class="error-text">Location required</div>
+        <input type="text" id="inp-name" placeholder="Full Name (e.g. John Doe)" />
+        <div class="error-text">Invalid name (Enter first and last name)</div>
       </div>
 
-      <div style="display: flex; gap: 10px;">
-        <div class="input-group" style="flex:1">
-          <input type="number" id="inp-mon" placeholder="Monthly ($)">
-          <div class="error-text">Invalid price</div>
-        </div>
-        <div class="input-group" style="flex:1">
-          <input type="number" id="inp-year" placeholder="Yearly ($)">
-          <div class="error-text">Invalid price</div>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="country-code-btn" style="flex: 0.35; height: 50px;" class="action-btn">+998</button>
+        <div class="input-group" style="flex: 1; margin-bottom: 0;">
+          <input type="text" id="inp-phone" placeholder="Phone (901234567)" />
+          <div class="error-text">Invalid phone number</div>
         </div>
       </div>
 
-      <div class="media-upload">
-        <div class="media-box" id="box-p1"><i class="fas fa-camera"></i><input type="file" id="file-p1" class="hidden" /></div>
-        <div class="media-box" id="box-p2"><i class="fas fa-camera"></i><input type="file" id="file-p2" class="hidden" /></div>
-        <div class="media-box" id="box-p3"><i class="fas fa-camera"></i><input type="file" id="file-p3" class="hidden" /></div>
-        <div class="media-box" id="box-p4"><i class="fas fa-camera"></i><input type="file" id="file-p4" class="hidden" /></div>
-        <div class="media-box" id="box-v1" style="border-style: solid;"><i class="fas fa-video"></i><input type="file" id="file-v1" class="hidden" /></div>
+      <div id="extra-fields" class="hidden">
+        <div class="input-group"><input type="text" id="inp-model" placeholder="Car Model" /><div class="error-text">Model required</div></div>
+        <div class="input-group"><input type="text" id="inp-loc" placeholder="Location" /><div class="error-text">Location required</div></div>
+        <div style="display: flex; gap: 10px;">
+          <div class="input-group" style="flex:1"><input type="number" id="inp-mon" placeholder="Monthly ($)" /><div class="error-text">Invalid price</div></div>
+          <div class="input-group" style="flex:1"><input type="number" id="inp-year" placeholder="Yearly ($)" /><div class="error-text">Invalid price</div></div>
+        </div>
+
+        <div class="media-upload">
+          <div class="media-box" id="box-p1"><i class="fas fa-camera"></i><input type="file" id="file-p1" class="hidden" /></div>
+          <div class="media-box" id="box-p2"><i class="fas fa-camera"></i><input type="file" id="file-p2" class="hidden" /></div>
+          <div class="media-box" id="box-p3"><i class="fas fa-camera"></i><input type="file" id="file-p3" class="hidden" /></div>
+          <div class="media-box" id="box-p4"><i class="fas fa-camera"></i><input type="file" id="file-p4" class="hidden" /></div>
+          <div class="media-box" id="box-v1" style="border-style: solid;"><i class="fas fa-video"></i><input type="file" id="file-v1" class="hidden" /></div>
+        </div>
+
+        <div class="error-text" id="err-media" style="margin-bottom: 15px;">Please upload all 4 photos and 1 video</div>
       </div>
 
-      <div class="error-text" id="err-media" style="margin-bottom: 15px;">Please upload all 4 photos and 1 video</div>
+      <button class="btn-submit" id="btn-next">Continue</button>
+      <p id="txt-back" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;">← Back</p>
     </div>
 
-    <button class="btn-submit" id="btn-next">Continue</button>
-    <p id="txt-back" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;">← Back</p>
-  </div>
-
-  <div id="car-results" class="hidden">
-    <h2 id="txt-title-take">Available Cars</h2>
-    <div class="car-grid">
-      <div class="car-item"><h3>Chevrolet Tahoe</h3><p>$1200/mo</p></div>
+    <div id="car-results" class="hidden">
+      <h2 id="txt-title-take">Available Cars</h2>
+      <div class="car-grid"><div class="car-item"><h3>Chevrolet Tahoe</h3><p>$1200/mo</p></div></div>
     </div>
   </div>
-</div>
 
-<!-- Supabase (hozircha tayyor, keyin URL/KEY qo‘shamiz) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script is:inline>
+    (() => {
+      try {
+        console.log("TEMURrentUZ script loaded ✅");
 
-<script is:inline>
-  document.addEventListener("DOMContentLoaded", () => {
-    // ====== STATE ======
-    let isRegistered = false;
-    let userData = { name: "", phone: "" };
-    let currentMode = "";
+        let isRegistered = false;
+        let userData = { name: "", phone: "" };
+        let currentMode = "";
 
-    // ====== TRANSLATIONS ======
-    const translations = {
-      "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", submit: "Joylash", back: "← Orqaga" },
-      "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", submit: "Post Ad", back: "← Back" },
-      "Русский": { login: "Вход", give: "Сдать", take: "Снять", givesub: "Добавить авто", takesub: "Поиск авто", submit: "Разместить", back: "← Назад" },
-      "Türkçe": { login: "Giriş", give: "Kiraya Ver", take: "Kiralık Al", givesub: "Araba Ekle", takesub: "Araba Ara", submit: "Yayınla", back: "← Geri" },
-      "Deutsch": { login: "Anmelden", give: "Vermieten", take: "Mieten", givesub: "Auto hinzufügen", takesub: "Auto suchen", submit: "Senden", back: "← Zurück" },
-      "Français": { login: "Connexion", give: "Louer", take: "Prendre", givesub: "Ajouter", takesub: "Chercher", submit: "Publier", back: "← Retour" }
-    };
+        const translations = {
+          "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", submit: "Joylash", back: "← Orqaga" },
+          "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", submit: "Post Ad", back: "← Back" }
+        };
 
-    const countries = [
-      { n: "Uzbekistan", c: "+998" }, { n: "USA", c: "+1" }, { n: "Russia", c: "+7" },
-      { n: "Turkey", c: "+90" }, { n: "Germany", c: "+49" }, { n: "UK", c: "+44" },
-      { n: "UAE", c: "+971" }, { n: "Kazakhstan", c: "+7" }, { n: "Kyrgyzstan", c: "+996" },
-      { n: "Tajikistan", c: "+992" }, { n: "S. Korea", c: "+82" }, { n: "Poland", c: "+48" },
-      { n: "France", c: "+33" }, { n: "Italy", c: "+39" }, { n: "Egypt", c: "+20" },
-      { n: "India", c: "+91" }, { n: "Japan", c: "+81" }, { n: "China", c: "+86" }
-    ];
+        const countries = [
+          { n: "Uzbekistan", c: "+998" }, { n: "USA", c: "+1" }, { n: "Russia", c: "+7" },
+          { n: "Turkey", c: "+90" }, { n: "Germany", c: "+49" }, { n: "UK", c: "+44" }
+        ];
 
-    // ====== ELEMENTS ======
-    const overlayScreen = document.getElementById("overlay-screen");
-    const overlayContent = document.getElementById("overlay-content");
+        const $ = (id) => document.getElementById(id);
 
-    const countryOverlay = document.getElementById("country-overlay");
-    const countryContent = document.getElementById("country-content");
-    const countryBtn = document.getElementById("country-code-btn");
-    const btnCancelCountry = document.getElementById("btn-cancel-country");
+        // --- DOM tekshiruv
+        console.log("overlay-content:", $("overlay-content"));
 
-    const profileOverlay = document.getElementById("profile-overlay");
-    const profileTrigger = document.getElementById("profile-trigger");
-    const btnCloseProfile = document.getElementById("btn-close-profile");
-    const btnLogout = document.getElementById("btn-logout");
-    const btnProfileHome = document.getElementById("btn-profile-home");
-
-    const stepChoice = document.getElementById("step-choice");
-    const formRegister = document.getElementById("form-register");
-    const extraFields = document.getElementById("extra-fields");
-    const carResults = document.getElementById("car-results");
-
-    const inpName = document.getElementById("inp-name");
-    const inpPhone = document.getElementById("inp-phone");
-    const inpModel = document.getElementById("inp-model");
-    const inpLoc = document.getElementById("inp-loc");
-    const inpMon = document.getElementById("inp-mon");
-    const inpYear = document.getElementById("inp-year");
-
-    const errMedia = document.getElementById("err-media");
-
-    const txtLogin = document.getElementById("txt-login");
-    const txtGive = document.getElementById("txt-give");
-    const txtTake = document.getElementById("txt-take");
-    const txtGiveSub = document.getElementById("txt-givesub");
-    const txtTakeSub = document.getElementById("txt-takesub");
-    const txtBack = document.getElementById("txt-back");
-    const btnNext = document.getElementById("btn-next");
-
-    const profName = document.getElementById("prof-name");
-    const profPhone = document.getElementById("prof-phone");
-    const guestProfile = document.getElementById("guest-profile");
-    const userProfile = document.getElementById("user-profile");
-
-    // file boxes
-    const fileMap = [
-      { box: "box-p1", file: "file-p1" },
-      { box: "box-p2", file: "file-p2" },
-      { box: "box-p3", file: "file-p3" },
-      { box: "box-p4", file: "file-p4" },
-      { box: "box-v1", file: "file-v1" }
-    ];
-
-    // ====== HELPERS ======
-    function openProfile() { profileOverlay.classList.remove("hidden"); }
-    function closeProfile() { profileOverlay.classList.add("hidden"); }
-
-    function goHome() {
-      document.querySelectorAll("input").forEach(i => i.classList.remove("error"));
-      document.querySelectorAll(".error-text").forEach(e => e.style.display = "none");
-      formRegister.classList.add("hidden");
-      carResults.classList.add("hidden");
-      stepChoice.classList.remove("hidden");
-      closeProfile();
-    }
-
-    function showRegistration(mode) {
-      currentMode = mode;
-      stepChoice.classList.add("hidden");
-      formRegister.classList.remove("hidden");
-      if (mode === "give") extraFields.classList.remove("hidden");
-      else extraFields.classList.add("hidden");
-    }
-
-    function openCountryPicker() { countryOverlay.classList.remove("hidden"); }
-    function closeCountryPicker() { countryOverlay.classList.add("hidden"); }
-    function selectCountry(code) { countryBtn.innerText = code; closeCountryPicker(); }
-
-    function setLang(lang) {
-      const t = translations[lang] || translations["English"];
-      txtLogin.innerText = isRegistered ? userData.name.split(" ")[0] : t.login;
-      txtGive.innerText = t.give;
-      txtTake.innerText = t.take;
-      txtGiveSub.innerText = t.givesub;
-      txtTakeSub.innerText = t.takesub;
-      btnNext.innerText = t.submit;
-      txtBack.innerText = t.back;
-      overlayScreen.style.display = "none";
-    }
-
-    function handleLogoClick() {
-      if (!isRegistered) overlayScreen.style.display = "flex";
-      goHome();
-    }
-
-    function checkFileFilled(inputEl) {
-      const box = inputEl.parentElement;
-      if (inputEl.files && inputEl.files.length > 0) {
-        box.classList.add("filled");
-        box.classList.remove("error");
-      }
-    }
-
-    function handleFormSubmit() {
-      let allValid = true;
-
-      // media
-      if (currentMode === "give") {
-        const mediaOk = fileMap.every(x => {
-          const f = document.getElementById(x.file);
-          return f.files && f.files.length > 0;
+        // --- Language buttons yaratish
+        const overlayContent = $("overlay-content");
+        Object.keys(translations).forEach((lang) => {
+          const b = document.createElement("button");
+          b.className = "action-btn";
+          b.innerText = lang;
+          b.onclick = () => setLang(lang);
+          overlayContent.appendChild(b);
         });
-        if (!mediaOk) { errMedia.style.display = "block"; allValid = false; }
-        else errMedia.style.display = "none";
-      }
 
-      // checks
-      const checks = [
-        { el: inpName, type: "name" },
-        { el: inpPhone, type: "phone" }
-      ];
-      if (currentMode === "give") {
-        checks.push(
-          { el: inpModel, type: "text" },
-          { el: inpLoc, type: "text" },
-          { el: inpMon, type: "number" },
-          { el: inpYear, type: "number" }
-        );
-      }
-
-      checks.forEach(({ el, type }) => {
-        if (!el) return;
-        const val = (el.value || "").trim();
-        let ok = false;
-
-        if (type === "text") ok = val !== "";
-        if (type === "name") ok = val.split(" ").filter(Boolean).length >= 2;
-        if (type === "phone") ok = /^\d{7,15}$/.test(val);
-        if (type === "number") ok = val !== "" && !isNaN(val) && Number(val) > 0;
-
-        const err = el.nextElementSibling;
-        if (!ok) {
-          el.classList.add("error");
-          if (err) err.style.display = "block";
-          allValid = false;
-        } else {
-          el.classList.remove("error");
-          if (err) err.style.display = "none";
+        function setLang(lang) {
+          const t = translations[lang];
+          $("txt-login").innerText = isRegistered ? userData.name.split(" ")[0] : t.login;
+          $("txt-give").innerText = t.give;
+          $("txt-take").innerText = t.take;
+          $("txt-givesub").innerText = t.givesub;
+          $("txt-takesub").innerText = t.takesub;
+          $("btn-next").innerText = t.submit;
+          $("txt-back").innerText = t.back;
+          $("overlay-screen").style.display = "none";
         }
-      });
 
-      if (!allValid) return;
+        // --- Profile open/close
+        $("profile-open").onclick = () => $("profile-overlay").classList.remove("hidden");
+        $("btn-close-profile").onclick = () => $("profile-overlay").classList.add("hidden");
 
-      // success
-      isRegistered = true;
-      userData.name = inpName.value.trim();
-      userData.phone = countryBtn.innerText + " " + inpPhone.value.trim();
+        // --- Country picker
+        $("country-code-btn").onclick = () => $("country-overlay").classList.remove("hidden");
+        $("btn-cancel-country").onclick = () => $("country-overlay").classList.add("hidden");
 
-      profName.innerText = userData.name;
-      profPhone.innerText = userData.phone;
-      txtLogin.innerText = userData.name.split(" ")[0];
+        const countryContent = $("country-content");
+        countries.forEach((country) => {
+          const b = document.createElement("button");
+          b.className = "action-btn";
+          b.innerHTML = `<b>${country.c}</b><br><small>${country.n}</small>`;
+          b.onclick = () => {
+            $("country-code-btn").innerText = country.c;
+            $("country-overlay").classList.add("hidden");
+          };
+          countryContent.appendChild(b);
+        });
 
-      guestProfile.classList.add("hidden");
-      userProfile.classList.remove("hidden");
+        // --- Choice buttons
+        $("btn-give").onclick = () => showRegistration("give");
+        $("btn-take").onclick = () => showRegistration("take");
 
-      if (currentMode === "take") {
-        formRegister.classList.add("hidden");
-        carResults.classList.remove("hidden");
-      } else {
-        alert("Success!");
-        goHome();
+        function goHome() {
+          document.querySelectorAll("input").forEach((i) => i.classList.remove("error"));
+          document.querySelectorAll(".error-text").forEach((e) => (e.style.display = "none"));
+          $("form-register").classList.add("hidden");
+          $("car-results").classList.add("hidden");
+          $("step-choice").classList.remove("hidden");
+        }
+
+        $("logo-btn").onclick = () => {
+          goHome();
+          if (!isRegistered) $("overlay-screen").style.display = "flex";
+          $("profile-overlay").classList.add("hidden");
+        };
+
+        $("txt-back").onclick = goHome;
+
+        function showRegistration(mode) {
+          currentMode = mode;
+          $("step-choice").classList.add("hidden");
+          $("form-register").classList.remove("hidden");
+          if (mode === "give") $("extra-fields").classList.remove("hidden");
+          else $("extra-fields").classList.add("hidden");
+        }
+
+        // file input click
+        [["box-p1","file-p1"],["box-p2","file-p2"],["box-p3","file-p3"],["box-p4","file-p4"],["box-v1","file-v1"]].forEach(([box,file])=>{
+          $(box).onclick = ()=> $(file).click();
+          $(file).onchange = (e)=>{
+            if (e.target.files.length>0) $(box).classList.add("filled");
+          };
+        });
+
+        $("btn-next").onclick = () => {
+          let allValid = true;
+          const checks = [{ id: "inp-name", type: "name" }, { id: "inp-phone", type: "phone" }];
+
+          if (currentMode === "give") {
+            checks.push(
+              { id: "inp-model", type: "text" },
+              { id: "inp-loc", type: "text" },
+              { id: "inp-mon", type: "number" },
+              { id: "inp-year", type: "number" }
+            );
+            const mediaOk = ["file-p1", "file-p2", "file-p3", "file-p4", "file-v1"].every((id) => $(id).files.length > 0);
+            if (!mediaOk) { $("err-media").style.display = "block"; allValid = false; }
+            else { $("err-media").style.display = "none"; }
+          }
+
+          checks.forEach((check) => {
+            const el = $(check.id);
+            const val = el.value.trim();
+            let isOk = false;
+
+            if (check.type === "text") isOk = val !== "";
+            else if (check.type === "name") isOk = val.split(" ").length >= 2;
+            else if (check.type === "phone") isOk = /^\d{7,15}$/.test(val);
+            else if (check.type === "number") isOk = !isNaN(val) && parseFloat(val) > 0;
+
+            const err = el.nextElementSibling;
+            if (!isOk) { el.classList.add("error"); if (err) err.style.display = "block"; allValid = false; }
+            else { el.classList.remove("error"); if (err) err.style.display = "none"; }
+          });
+
+          if (!allValid) return;
+
+          isRegistered = true;
+          userData.name = $("inp-name").value;
+          userData.phone = $("country-code-btn").innerText + " " + $("inp-phone").value;
+
+          $("prof-name").innerText = userData.name;
+          $("prof-phone").innerText = userData.phone;
+          $("txt-login").innerText = userData.name.split(" ")[0];
+
+          $("guest-profile").classList.add("hidden");
+          $("user-profile").classList.remove("hidden");
+
+          if (currentMode === "take") {
+            $("form-register").classList.add("hidden");
+            $("car-results").classList.remove("hidden");
+          } else {
+            alert("Success!");
+            goHome();
+          }
+        };
+
+        $("btn-logout").onclick = () => location.reload();
+
+      } catch (err) {
+        console.error("TEMURrentUZ ERROR ❌", err);
+        alert("Console’da xato chiqdi. F12 → Console’ni ochib errorni yubor.");
       }
-    }
-
-    // ====== BUILD LANGUAGE BUTTONS ======
-    overlayContent.innerHTML = "";
-    Object.keys(translations).forEach(lang => {
-      const b = document.createElement("button");
-      b.className = "action-btn";
-      b.innerText = lang;
-      b.onclick = () => setLang(lang);
-      overlayContent.appendChild(b);
-    });
-
-    // ====== BUILD COUNTRY BUTTONS ======
-    countryContent.innerHTML = "";
-    countries.forEach(country => {
-      const b = document.createElement("button");
-      b.className = "action-btn";
-      b.innerHTML = `<b>${country.c}</b><br><small>${country.n}</small>`;
-      b.onclick = () => selectCountry(country.c);
-      countryContent.appendChild(b);
-    });
-
-    // ====== EVENTS ======
-    document.getElementById("logo-btn").addEventListener("click", handleLogoClick);
-    profileTrigger.addEventListener("click", openProfile);
-    btnCloseProfile.addEventListener("click", closeProfile);
-
-    btnProfileHome.addEventListener("click", () => { goHome(); closeProfile(); });
-
-    btnLogout.addEventListener("click", () => location.reload());
-
-    document.getElementById("btn-give").addEventListener("click", () => showRegistration("give"));
-    document.getElementById("btn-take").addEventListener("click", () => showRegistration("take"));
-    btnNext.addEventListener("click", handleFormSubmit);
-    txtBack.addEventListener("click", goHome);
-
-    countryBtn.addEventListener("click", openCountryPicker);
-    btnCancelCountry.addEventListener("click", closeCountryPicker);
-
-    // file events
-    fileMap.forEach(x => {
-      const box = document.getElementById(x.box);
-      const file = document.getElementById(x.file);
-      if (!box || !file) return;
-
-      box.addEventListener("click", () => file.click());
-      file.addEventListener("change", () => checkFileFilled(file));
-    });
-
-    // default til
-    setLang("English");
-  });
-</script>
+    })();
+  </script>
+</Layout>
