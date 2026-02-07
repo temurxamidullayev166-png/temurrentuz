@@ -188,7 +188,16 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 <script is:inline>
+  <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const supabaseUrl = "https://XXXX.supabase.co";
+  const supabaseKey = "PUBLIC_ANON_KEY";
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  console.log("Supabase ishlayapti ✅", supabase);
+</script>
 
   (() => {
     // --------- Supabase init (ENV dan oladi) ----------
