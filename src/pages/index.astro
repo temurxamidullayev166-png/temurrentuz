@@ -187,220 +187,518 @@ import Layout from "../layouts/Layout.astro";
       <div class="car-grid"><div class="car-item"><h3>Chevrolet Tahoe</h3><p>$1200/mo</p></div></div>
     </div>
   </div>
+<script is:inline>
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-  <script is:inline>
-    (() => {
-      try {
-        console.log("TEMURrentUZ script loaded ✅");
+  (() => {
+    // --------- Supabase init (ENV dan oladi) ----------
+    const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+    const SUPABASE_ANON = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-        let isRegistered = false;
-        let userData = { name: "", phone: "" };
-        let currentMode = "";
+    if (!SUPABASE_URL || !SUPABASE_ANON) {
+      alert("ENV xato: PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_ANON_KEY yo‘q!");
+      console.error("Missing ENV");
+      return;
+    }
 
-       
- const translations = {
-            "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", title_give: "Ma'lumotlar", title_take: "Mashinalar", model: "Model", phone: "Telefon", social: "Telegram/WhatsApp", loc: "Manzil", mon: "Oylik ($)", year: "Yillik ($)", submit: "Joylash", back: "← Orqaga", price: "Narx:" },
-            "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", title_give: "Details", title_take: "Cars", model: "Model", phone: "Phone", social: "Social Media", loc: "Location", mon: "Monthly ($)", year: "Yearly ($)", submit: "Post Ad", back: "← Back", price: "Price:" },
-            "Русский": { login: "Вход", give: "Сдать", take: "Снять", givesub: "Добавить авто", takesub: "Поиск авто", title_give: "Данные", title_take: "Машины", model: "Модель", phone: "Телефон", social: "Соцсети", loc: "Адрес", mon: "Месяц ($)", year: "Год ($)", submit: "Разместить", back: "← Назад", price: "Цена:" },
-            "Türkçe": { login: "Giriş", give: "Kiraya Ver", take: "Kiralık Al", givesub: "Araba Ekle", takesub: "Araba Ara", title_give: "Detaylar", title_take: "Arabalar", model: "Model", phone: "Telefon", social: "Sosyal Medya", loc: "Konum", mon: "Aylık ($)", year: "Yıllık ($)", submit: "Yayınla", back: "← Geri", price: "Fiyat:" },
-            "Deutsch": { login: "Anmelden", give: "Vermieten", take: "Mieten", givesub: "Auto hinzufügen", takesub: "Auto suchen", title_give: "Details", title_take: "Autos", model: "Modell", phone: "Telefon", social: "Social Media", loc: "Standort", mon: "Monatlich ($)", year: "Jährlich ($)", submit: "Senden", back: "← Zurück", price: "Preis:" },
-            "Français": { login: "Connexion", give: "Louer", take: "Prendre", givesub: "Ajouter", takesub: "Chercher", title_give: "Détails", title_take: "Voitures", model: "Modèle", phone: "Téléphone", social: "Réseaux sociaux", loc: "Emplacement", mon: "Mensuel ($)", year: "Annuel ($)", submit: "Publier", back: "← Retour", price: "Prix:" },
-            "Español": { login: "Entrar", give: "Alquilar", take: "Rentar", givesub: "Añadir", takesub: "Buscar", title_give: "Detalles", title_take: "Autos", model: "Modelo", phone: "Teléfono", social: "Redes", loc: "Ubicación", mon: "Mensual ($)", year: "Anual ($)", submit: "Publicar", back: "← Volver", price: "Precio:" },
-            "Italiano": { login: "Accedi", give: "Noleggia", take: "Affitta", givesub: "Aggiungi", takesub: "Cerca", title_give: "Dettagli", title_take: "Auto", model: "Modello", phone: "Telefono", social: "Social", loc: "Posizione", mon: "Mensile ($)", year: "Annuale ($)", submit: "Invia", back: "← Indietro", price: "Prezzo:" },
-            "Português": { login: "Entrar", give: "Alugar", take: "Arrendar", givesub: "Adicionar", takesub: "Procurar", title_give: "Detalhes", title_take: "Carros", model: "Modelo", phone: "Telefone", social: "Redes", loc: "Localização", mon: "Mensal ($)", year: "Anual ($)", submit: "Postar", back: "← Voltar", price: "Preço:" },
-            "العربية": { login: "دخول", give: "تأجير", take: "استئجار", givesub: "إضافة", takesub: "بحث", title_give: "تفاصيل", title_take: "سيارات", model: "موديل", phone: "هاتف", social: "تواصل", loc: "موقع", mon: "شهري ($)", year: "سنوي ($)", submit: "نشر", back: "← عودة", price: "السعر:" },
-            "हिन्दी": { login: "लॉगिन", give: "किराये पर दें", take: "किराये पर लें", givesub: "गाड़ी जोड़ें", takesub: "खोजें", title_give: "विवरण", title_take: "गाड़ियाँ", model: "मॉडल", phone: "फ़ोन", social: "सोशल मीडिया", loc: "स्थान", mon: "मासिक ($)", year: "वार्षिक ($)", submit: "पोस्ट करें", back: "← पीछे", price: "कीमत:" },
-            "日本語": { login: "ログイン", give: "貸し出す", take: "借りる", givesub: "車を追加", takesub: "検索", title_give: "詳細", title_take: "車リスト", model: "モデル", phone: "電話", social: "SNS", loc: "場所", mon: "月額 ($)", year: "年額 ($)", submit: "投稿", back: "← 戻る", price: "価格:" },
-            "한국어": { login: "로그인", give: "대여하기", take: "임차하기", givesub: "차량 추가", takesub: "검색", title_give: "세부사항", title_take: "차량 목록", model: "모델", phone: "전화", social: "SNS", loc: "위치", mon: "월간 ($)", year: "연간 ($)", submit: "등록", back: "← 뒤로", price: "가격:" },
-            "中文": { login: "登录", give: "出租", take: "租车", givesub: "添加车辆", takesub: "搜索", title_give: "详情", title_take: "车辆列表", model: "型号", phone: "电话", social: "社交媒体", loc: "地点", mon: "每月 ($)", year: "每年 ($)", submit: "发布", back: "← 返回", price: "价格:" },
-            "Tiếng Việt": { login: "Đăng nhập", give: "Cho thuê", take: "Thuê xe", givesub: "Thêm xe", takesub: "Tìm kiếm", title_give: "Chi tiết", title_take: "Danh sách xe", model: "Mẫu xe", phone: "Điện thoại", social: "Mạng xã hội", loc: "Địa điểm", mon: "Hàng tháng ($)", year: "Hàng năm ($)", submit: "Đăng tin", back: "← Quay lại", price: "Giá:" },
-            "Қазақша": { login: "Кіру", give: "Жалға беру", take: "Жалға алу", givesub: "Көлік қосу", takesub: "Көлік іздеу", title_give: "Мәліметтер", title_take: "Көліктер", model: "Модель", phone: "Телефон", social: "Әлеуметтік желі", loc: "Мекенжай", mon: "Айлық ($)", year: "Жылдық ($)", submit: "Жариялау", back: "← Артқа", price: "Баға:" },
-            "Polski": { login: "Zaloguj", give: "Wynajmij", take: "Wypożycz", givesub: "Dodaj auto", takesub: "Szukaj", title_give: "Szczegóły", title_take: "Auta", model: "Model", phone: "Telefon", social: "Media", loc: "Lokalizacja", mon: "Miesięcznie ($)", year: "Rocznie ($)", submit: "Wyślij", back: "← Wstecz", price: "Cena:" },
-            "Nederlands": { login: "Inloggen", give: "Verhuren", take: "Huren", givesub: "Auto toevoegen", takesub: "Zoeken", title_give: "Details", title_take: "Auto's", model: "Model", phone: "Telefoon", social: "Sociale Media", loc: "Locatie", mon: "Maandelijks ($)", year: "Jaarlijks ($)", submit: "Plaatsen", back: "← Terug", price: "Prijs:" },
-            "Svenska": { login: "Logga in", give: "Hyr ut", take: "Hyra", givesub: "Lägg till", takesub: "Sök bilar", title_give: "Detaljer", title_take: "Bilar", model: "Modell", phone: "Telefon", social: "Sociala Medier", loc: "Plats", mon: "Månadsvis ($)", year: "Årligen ($)", submit: "Publicera", back: "← Bakåt", price: "Pris:" },
-            "Norsk": { login: "Logg inn", give: "Lei ut", take: "Lei", givesub: "Legg til bil", takesub: "Søk bil", title_give: "Detaljer", title_take: "Biler", model: "Modell", phone: "Telefon", social: "Sosiale Medier", loc: "Sted", mon: "Månedlig ($)", year: "Årlig ($)", submit: "Publiser", back: "← Tilbake", price: "Pris:" },
-            "Suomi": { login: "Kirjaudu", give: "Vuokraa", take: "Vuokraus", givesub: "Lisää auto", takesub: "Etsi autoja", title_give: "Tiedot", title_take: "Autot", model: "Malli", phone: "Puhelin", social: "Sosiaalinen media", loc: "Sijainti", mon: "Kuukausi ($)", year: "Vuosi ($)", submit: "Ilmoita", back: "← Takaisin", price: "Hinta:" },
-            "Dansk": { login: "Log ind", give: "Udlej", take: "Leje", givesub: "Tilføj bil", takesub: "Søg bil", title_give: "Detaljer", title_take: "Biler", model: "Model", phone: "Telefon", social: "Sociale medier", loc: "Placering", mon: "Månedlig ($)", year: "Årligt ($)", submit: "Indsend", back: "← Tilbage", price: "Pris:" },
-            "Ελληνικά": { login: "Είσοδος", give: "Ενοικίαση", take: "Πάρτε", givesub: "Προσθήκη", takesub: "Αναζήτηση", title_give: "Λεπτομέρειες", title_take: "Αυτοκίνητα", model: "Μοντέλο", phone: "Τηλέφωνο", social: "Social Media", loc: "Τοποθεσία", mon: "Μηνιαία ($)", year: "Ετήσια ($)", submit: "Δημοσίευση", back: "← Πίσω", price: "Τιμή:" },
-            "Magyar": { login: "Belépés", give: "Bérbeadás", take: "Bérlés", givesub: "Autó hozzáadása", takesub: "Keresés", title_give: "Részletek", title_take: "Autók", model: "Modell", phone: "Telefon", social: "Közösségi média", loc: "Helyszín", mon: "Havi ($)", year: "Éves ($)", submit: "Közzététel", back: "← Vissza", price: "Ár:" },
-            "Čeština": { login: "Přihlásit", give: "Pronajmout", take: "Půjčit", givesub: "Přidat auto", takesub: "Hledat", title_give: "Detaily", title_take: "Auta", model: "Model", phone: "Telefon", social: "Sociální sítě", loc: "Poloha", mon: "Měsíčně ($)", year: "Ročně ($)", submit: "Publikovat", back: "← Zpět", price: "Cena:" },
-            "Slovenčina": { login: "Prihlásiť", give: "Prenajať", take: "Požičať", givesub: "Pridať auto", takesub: "Hľadať", title_give: "Detaily", title_take: "Autá", model: "Model", phone: "Telefón", social: "Sociálne siete", loc: "Poloha", mon: "Mesačne ($)", year: "Ročne ($)", submit: "Odoslať", back: "← Späť", price: "Cena:" },
-            "Română": { login: "Autentificare", give: "Închiriază", take: "Ia", givesub: "Adaugă mașină", takesub: "Caută", title_give: "Detalii", title_take: "Mașini", model: "Model", phone: "Telefon", social: "Social Media", loc: "Locație", mon: "Lunar ($)", year: "Anual ($)", submit: "Postează", back: "← Înapoi", price: "Preț:" },
-            "Български": { login: "Вход", give: "Давам под наем", take: "Наемам", givesub: "Добави кола", takesub: "Търсене", title_give: "Детайли", title_take: "Коли", model: "Модел", phone: "Телефон", social: "Социални мрежи", loc: "Локация", mon: "Месечно ($)", year: "Годишно ($)", submit: "Публикувай", back: "← Назад", price: "Цена:" },
-            "Українська": { login: "Увійти", give: "Здати в оренду", take: "Орендувати", givesub: "Додати авто", takesub: "Пошук", title_give: "Деталі", title_take: "Машини", model: "Модель", phone: "Телефон", social: "Соцмережі", loc: "Адреса", mon: "Місяць ($)", year: "Рік ($)", submit: "Розмістити", back: "← Назад", price: "Ціна:" },
-            "Hrvatski": { login: "Prijavi se", give: "Iznajmi", take: "Unajmi", givesub: "Dodaj auto", takesub: "Pretraži", title_give: "Detalji", title_take: "Auti", model: "Model", phone: "Telefon", social: "Društvene mreže", loc: "Lokacija", mon: "Mjesečno ($)", year: "Godišnje ($)", submit: "Objavi", back: "← Natrag", price: "Cijena:" },
-            "Srpski": { login: "Prijavi se", give: "Izdaj", take: "Iznajmi", givesub: "Dodaj auto", takesub: "Pretraži", title_give: "Detalji", title_take: "Auti", model: "Model", phone: "Telefon", social: "Društvene mreže", loc: "Lokacija", mon: "Mesečno ($)", year: "Godišnje ($)", submit: "Objavi", back: "← Nazad", price: "Cena:" },
-            "Lietuvių": { login: "Prisijungti", give: "Išnuomoti", take: "Nuomotis", givesub: "Pridėti", takesub: "Paieška", title_give: "Detalės", title_take: "Automobiliai", model: "Modelis", phone: "Telefonas", social: "Tinklai", loc: "Vieta", mon: "Mėnuo ($)", year: "Metai ($)", submit: "Skelbti", back: "← Atgal", price: "Kaina:" },
-            "Latviešu": { login: "Ielogoties", give: "Izīrēt", take: "Īrēt", givesub: "Pievienot auto", takesub: "Meklēt", title_give: "Detaļas", title_take: "Auto", model: "Modelis", phone: "Tālrunis", social: "Tīkli", loc: "Vieta", mon: "Mēnesī ($)", year: "Gadā ($)", submit: "Publicēt", back: "← Atpaka", price: "Cena:" },
-            "Eesti": { login: "Logi sisse", give: "Rendi välja", take: "Rendi", givesub: "Lisa auto", takesub: "Otsi", title_give: "Detailid", title_take: "Autod", model: "Mudel", phone: "Telefon", social: "Sotsiaalmeedia", loc: "Asukoht", mon: "Kuus ($)", year: "Aastas ($)", submit: "Postita", back: "← Tagasi", price: "Hind:" },
-            "Bahasa Indonesia": { login: "Masuk", give: "Sewakan", take: "Sewa", givesub: "Tambah mobil", takesub: "Cari", title_give: "Detail", title_take: "Mobil", model: "Model", phone: "Telepon", social: "Media Sosial", loc: "Lokasi", mon: "Bulanan ($)", year: "Tahunan ($)", submit: "Posting", back: "← Kembali", price: "Harga:" },
-            "Melayu": { login: "Log masuk", give: "Sewakan", take: "Sewa", givesub: "Tambah kereta", takesub: "Cari", title_give: "Butiran", title_take: "Kereta", model: "Model", phone: "Telefon", social: "Media Sosial", loc: "Lokasi", mon: "Bulanan ($)", year: "Tahunan ($)", submit: "Siarkan", back: "← Kembali", price: "Harga:" },
-            "ไทย": { login: "เข้าสู่ระบบ", give: "ให้เช่า", take: "เช่ารถ", givesub: "เพิ่มรถ", takesub: "ค้นหา", title_give: "รายละเอียด", title_take: "รถยนต์", model: "รุ่น", phone: "โทรศัพท์", social: "โซเชียล", loc: "ที่อยู่", mon: "รายเดือน ($)", year: "รายปี ($)", submit: "โพสต์", back: "← กลับ", price: "ราคา:" },
-            "Filipino": { login: "Mag-login", give: "Paupahan", take: "Umuwa", givesub: "Magdagdag", takesub: "Maghanap", title_give: "Detalye", title_take: "Mga Kotse", model: "Modelo", phone: "Telepono", social: "Social Media", loc: "Lokasyon", mon: "Buwanan ($)", year: "Taunan ($)", submit: "I-post", back: "← Bumalik", price: "Presyo:" },
-            "עברית": { login: "התחבר", give: "להשכיר", take: "לשכור", givesub: "הוסף רכב", takesub: "חפש רכב", title_give: "פרטים", title_take: "רכבים", model: "מודל", phone: "טלפון", social: "מדיה חברתית", loc: "מיקום", mon: "חודשי ($)", year: "שנתי ($)", submit: "פרסם", back: "← חזור", price: "מחיר:" },
-            "فارسی": { login: "ورود", give: "اجاره دادن", take: "اجاره کردن", givesub: "افزودن ماشین", takesub: "جستجو", title_give: "جزئیات", title_take: "ماشین‌ها", model: "مدل", phone: "تلفن", social: "شبکه‌های اجتماعی", loc: "مکان", mon: "ماهانه ($)", year: "سالانه ($)", submit: "ثبت آگهی", back: "← بازگشت", price: "قیمت:" },
-            "Urdu": { login: "لاگ ان", give: "کرایہ پر دیں", take: "کرایہ پر لیں", givesub: "گاڑی شامل کریں", takesub: "تلاش کریں", title_give: "تفصیلات", title_take: "گاڑیاں", model: "ماڈل", phone: "فون", social: "سوشل میڈیا", loc: "مقام", mon: "ماہانہ ($)", year: "سالانہ ($)", submit: "پوسٹ کریں", back: "← واپسی", price: "قیمت:" },
-            "Bengali": { login: "লগইন", give: "ভাড়া দিন", take: "ভাড়া নিন", givesub: "গাড়ি যোগ করুন", takesub: "খুঁজুন", title_give: "বিস্তারিত", title_take: "গাড়ি", model: "মডেল", phone: "ফোন", social: "সোশ্যাল মিডিয়া", loc: "অবস্থান", mon: "মাসিক ($)", year: "বার্ষিক ($)", submit: "পোস্ট", back: "← পিছনে", price: "মূল্য:" },
-            "Swahili": { login: "Ingia", give: "Kukodisha", take: "Kodisha", givesub: "Ongeza gari", takesub: "Tafuta gari", title_give: "Maelezo", title_take: "Magari", model: "Mfano", phone: "Simu", social: "Mitandao", loc: "Eneo", mon: "Mwezi ($)", year: "Mwaka ($)", submit: "Chapisha", back: "← Rudi", price: "Bei:" },
-            "Amharic": { login: "ግባ", give: "አከራይ", take: "ተከራይ", givesub: "መኪና አክል", takesub: "ፈልግ", title_give: "ዝርዝሮች", title_take: "መኪኖች", model: "ሞዴል", phone: "ስልክ", social: "ማህበራዊ ሚዲያ", loc: "አካባቢ", mon: "በወር ($)", year: "በዓመት ($)", submit: "ለጥፍ", back: "← ተመለስ", price: "ዋጋ:" },
-            "Sinhala": { login: "පිවිසෙන්න", give: "කුලියට දෙන්න", take: "කුලියට ගන්න", givesub: "රථයක් එක් කරන්න", takesub: "සොයන්න", title_give: "විස්තර", title_take: "මෝටර් රථ", model: "මාදිලිය", phone: "දුරකථන", social: "සමාජ මාධ්‍ය", loc: "ස්ථානය", mon: "මාසික ($)", year: "වාර්ෂික ($)", submit: "පළ කරන්න", back: "← ආපසු", price: "මිල:" },
-            "Tamil": { login: "உள்நுழை", give: "வாடகைக்கு விடு", take: "வாடகைக்கு எடு", givesub: "காரை சேர்", takesub: "தேடு", title_give: "விவரங்கள்", title_take: "கார்கள்", model: "மாடல்", phone: "தொலைபேசி", social: "சமூக ஊடகங்கள்", loc: "இடம்", mon: "மாதாந்திர ($)", year: "ஆண்டு ($)", submit: "பதிவிடு", back: "← பின்", price: "விலை:" },
-            "Telugu": { login: "లాగిన్", give: "అద్దెకు ఇవ్వండి", take: "అద్దెకు తీసుకోండి", givesub: "కారును జోడించు", takesub: "వెతకండి", title_give: "వివరాలు", title_take: "కార్లు", model: "మోడల్", phone: "ఫోన్", social: "సోషల్ మీడియా", loc: "స్థానం", mon: "నెలవారీ ($)", year: "వార్షික ($)", submit: "పోస్ట్ చేయండి", back: "← వెనుకకు", price: "ధర:" },
-            "Marathi": { login: "लॉगिन", give: "भाड्याने द्या", take: "भाड्याने घ्या", givesub: "कार जोडा", takesub: "शोधा", title_give: "तपशील", title_take: "गाड्या", model: "मॉडेल", phone: "फोन", social: "सोशल मीडिया", loc: "ठिकाण", mon: "मासिक ($)", year: "वार्षिक ($)", submit: "पोस्ट करा", back: "← मागे", price: "किंमत:" }
-        };
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-        const countries = [
-            { n: "Uzbekistan", c: "+998" }, { n: "USA", c: "+1" }, { n: "Russia", c: "+7" },
-            { n: "Turkey", c: "+90" }, { n: "Germany", c: "+49" }, { n: "UK", c: "+44" },
-            { n: "UAE", c: "+971" }, { n: "Kazakhstan", c: "+7" }, { n: "Kyrgyzstan", c: "+996" },
-            { n: "Tajikistan", c: "+992" }, { n: "S. Korea", c: "+82" }, { n: "Poland", c: "+48" },
-            { n: "France", c: "+33" }, { n: "Italy", c: "+39" }, { n: "Egypt", c: "+20" },
-            { n: "India", c: "+91" }, { n: "Japan", c: "+81" }, { n: "China", c: "+86" }
-        ];
-        let currentMode = ''; 
+    // --------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => (Number.isFinite(n) ? n.toFixed(2) : n);
 
-        const $ = (id) => document.getElementById(id);
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(a));
+    }
 
-        // --- DOM tekshiruv
-        console.log("overlay-content:", $("overlay-content"));
+    // --------- Region list (UZ) ----------
+    const UZ_REGIONS = [
+      "Toshkent", "Toshkent viloyati", "Andijon", "Namangan", "Farg‘ona",
+      "Samarqand", "Buxoro", "Navoiy", "Qashqadaryo", "Surxondaryo",
+      "Jizzax", "Sirdaryo", "Xorazm", "Qoraqalpog‘iston"
+    ];
 
-        // --- Language buttons yaratish
-        const overlayContent = $("overlay-content");
-        Object.keys(translations).forEach((lang) => {
-          const b = document.createElement("button");
-          b.className = "action-btn";
-          b.innerText = lang;
-          b.onclick = () => setLang(lang);
-          overlayContent.appendChild(b);
-        });
+    // --------- UI inject (minimal) ----------
+    // Biz mavjud layoutni buzmaymiz: container ichiga dashboard qo‘shamiz.
+    const container = document.querySelector(".container");
+    const dash = document.createElement("div");
+    dash.id = "dash";
+    dash.className = "card hidden";
+    dash.style.marginTop = "20px";
+    dash.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div>
+          <h2 style="margin-bottom:6px;">Dashboard</h2>
+          <div style="opacity:.7; font-size:12px;" id="whoami">Guest</div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="action-btn" id="btn-google">Login with Google</button>
+          <button class="action-btn hidden" id="btn-logout2" style="background:#ef4444;">Logout</button>
+        </div>
+      </div>
 
-        function setLang(lang) {
-          const t = translations[lang];
-          $("txt-login").innerText = isRegistered ? userData.name.split(" ")[0] : t.login;
-          $("txt-give").innerText = t.give;
-          $("txt-take").innerText = t.take;
-          $("txt-givesub").innerText = t.givesub;
-          $("txt-takesub").innerText = t.takesub;
-          $("btn-next").innerText = t.submit;
-          $("txt-back").innerText = t.back;
-          $("overlay-screen").style.display = "none";
+      <hr style="border:0; border-top:1px solid rgba(255,255,255,.08); margin:18px 0;" />
+
+      <div id="location-step" class="hidden">
+        <h3 style="margin-bottom:10px;">Location (Country → Region)</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div>
+            <div style="font-size:12px; opacity:.7; margin-bottom:6px;">Country</div>
+            <select id="sel-country" style="width:100%; padding:12px; border-radius:12px; background:rgba(15,23,42,.6); color:white; border:1px solid rgba(255,255,255,.1);">
+              <option value="Uzbekistan">Uzbekistan</option>
+              <option value="USA">USA</option>
+              <option value="Turkey">Turkey</option>
+              <option value="Germany">Germany</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:12px; opacity:.7; margin-bottom:6px;">Region</div>
+            <select id="sel-region" style="width:100%; padding:12px; border-radius:12px; background:rgba(15,23,42,.6); color:white; border:1px solid rgba(255,255,255,.1);"></select>
+          </div>
+        </div>
+        <button class="btn-submit" id="btn-save-loc" style="margin-top:12px;">Save location</button>
+      </div>
+
+      <div id="add-car" class="hidden" style="margin-top:18px;">
+        <h3 style="margin-bottom:10px;">Rent Out — Add Car</h3>
+
+        <div class="input-group"><input id="car-title" placeholder="Title (e.g. Malibu 2)" /></div>
+        <div class="input-group"><input id="car-model" placeholder="Model" /></div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="input-group"><input id="car-city" placeholder="City (optional)" /></div>
+          <div class="input-group"><input id="car-price" type="number" placeholder="Price per day ($)" /></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="input-group"><input id="car-from" type="date" /></div>
+          <div class="input-group"><input id="car-to" type="date" /></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="input-group"><input id="car-lat" placeholder="Latitude (e.g. 41.311)" /></div>
+          <div class="input-group"><input id="car-lng" placeholder="Longitude (e.g. 69.279)" /></div>
+        </div>
+
+        <p style="font-size:12px; opacity:.7; margin:6px 0 10px;">
+          Tip: lat/lng uchun Google Maps → right click → “What’s here?” → koordinata.
+        </p>
+
+        <button class="btn-submit" id="btn-add-car">Publish car</button>
+        <div id="addcar-msg" style="margin-top:10px; font-size:12px; opacity:.8;"></div>
+      </div>
+
+      <div id="nearby" class="hidden" style="margin-top:18px;">
+        <h3 style="margin-bottom:10px;">Nearest cars</h3>
+        <div id="cars-list" style="display:grid; gap:12px;"></div>
+
+        <h3 style="margin:18px 0 10px;">Map</h3>
+        <div id="map" style="height:340px; border-radius:18px; border:1px solid rgba(255,255,255,.1); overflow:hidden;"></div>
+      </div>
+
+      <div id="my-bookings" class="hidden" style="margin-top:18px;">
+        <h3 style="margin-bottom:10px;">Bookings (My / For my cars)</h3>
+        <div id="bookings-list" style="display:grid; gap:12px;"></div>
+      </div>
+    `;
+    container.appendChild(dash);
+
+    // Leaflet CDN (map uchun)
+    const leafletCss = document.createElement("link");
+    leafletCss.rel = "stylesheet";
+    leafletCss.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(leafletCss);
+
+    const leafletJs = document.createElement("script");
+    leafletJs.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    document.body.appendChild(leafletJs);
+
+    // --------- State ----------
+    let session = null;
+    let profile = {
+      country: "Uzbekistan",
+      region: "Toshkent",
+      lat: null,
+      lng: null,
+    };
+
+    let map = null;
+    let markers = [];
+
+    function setRegions() {
+      const country = $("sel-country").value;
+      const sel = $("sel-region");
+      sel.innerHTML = "";
+
+      const regions = country === "Uzbekistan" ? UZ_REGIONS : ["Default"];
+      regions.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r;
+        opt.textContent = r;
+        sel.appendChild(opt);
+      });
+
+      if (country === "Uzbekistan") sel.value = "Toshkent";
+    }
+
+    function showDash() {
+      $("dash").classList.remove("hidden");
+    }
+
+    function setAuthUI(isAuthed) {
+      $("btn-google").classList.toggle("hidden", isAuthed);
+      $("btn-logout2").classList.toggle("hidden", !isAuthed);
+      $("location-step").classList.toggle("hidden", !isAuthed);
+      $("add-car").classList.toggle("hidden", !isAuthed);
+      $("nearby").classList.toggle("hidden", !isAuthed);
+      $("my-bookings").classList.toggle("hidden", !isAuthed);
+
+      if (!isAuthed) {
+        $("whoami").textContent = "Guest (login kerak)";
+      }
+    }
+
+    // --------- Auth ----------
+    async function refreshSession() {
+      const { data } = await supabase.auth.getSession();
+      session = data.session;
+
+      setAuthUI(!!session);
+
+      if (session?.user) {
+        const u = session.user;
+        $("whoami").textContent = `Logged: ${u.email || u.id}`;
+        // default: location step ko‘rsat
+        $("location-step").classList.remove("hidden");
+        setRegions();
+
+        // geolocation (yaqin mashinalar uchun)
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            profile.lat = pos.coords.latitude;
+            profile.lng = pos.coords.longitude;
+            // avtomatik refresh
+            loadCarsNearby();
+            loadBookings();
+          }, () => {
+            // user ruxsat bermasa ham ishlayveradi
+            loadCarsNearby();
+            loadBookings();
+          });
+        } else {
+          loadCarsNearby();
+          loadBookings();
         }
+      }
+    }
 
-        // --- Profile open/close
-        $("profile-open").onclick = () => $("profile-overlay").classList.remove("hidden");
-        $("btn-close-profile").onclick = () => $("profile-overlay").classList.add("hidden");
+    $("btn-google").onclick = async () => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin }
+      });
+      if (error) alert(error.message);
+    };
 
-        // --- Country picker
-        $("country-code-btn").onclick = () => $("country-overlay").classList.remove("hidden");
-        $("btn-cancel-country").onclick = () => $("country-overlay").classList.add("hidden");
+    $("btn-logout2").onclick = async () => {
+      await supabase.auth.signOut();
+      location.reload();
+    };
 
-        const countryContent = $("country-content");
-        countries.forEach((country) => {
-          const b = document.createElement("button");
-          b.className = "action-btn";
-          b.innerHTML = `<b>${country.c}</b><br><small>${country.n}</small>`;
-          b.onclick = () => {
-            $("country-code-btn").innerText = country.c;
-            $("country-overlay").classList.add("hidden");
-          };
-          countryContent.appendChild(b);
-        });
+    // --------- Location step ----------
+    $("sel-country").onchange = setRegions;
+    setRegions();
 
-        // --- Choice buttons
-        $("btn-give").onclick = () => showRegistration("give");
-        $("btn-take").onclick = () => showRegistration("take");
+    $("btn-save-loc").onclick = async () => {
+      profile.country = $("sel-country").value;
+      profile.region = $("sel-region").value;
 
-        function goHome() {
-          document.querySelectorAll("input").forEach((i) => i.classList.remove("error"));
-          document.querySelectorAll(".error-text").forEach((e) => (e.style.display = "none"));
-          $("form-register").classList.add("hidden");
-          $("car-results").classList.add("hidden");
-          $("step-choice").classList.remove("hidden");
-        }
+      // location saqlashni hozir localStorage’ga qilamiz (tez)
+      localStorage.setItem("temur_location", JSON.stringify({
+        country: profile.country,
+        region: profile.region
+      }));
 
-        $("logo-btn").onclick = () => {
-          goHome();
-          if (!isRegistered) $("overlay-screen").style.display = "flex";
-          $("profile-overlay").classList.add("hidden");
-        };
+      $("location-step").classList.add("hidden");
+      loadCarsNearby();
+      loadBookings();
+    };
 
-        $("txt-back").onclick = goHome;
+    // old location
+    try {
+      const saved = JSON.parse(localStorage.getItem("temur_location") || "null");
+      if (saved?.country && saved?.region) {
+        profile.country = saved.country;
+        profile.region = saved.region;
+        $("sel-country").value = profile.country;
+        setRegions();
+        $("sel-region").value = profile.region;
+      }
+    } catch {}
 
-        function showRegistration(mode) {
-          currentMode = mode;
-          $("step-choice").classList.add("hidden");
-          $("form-register").classList.remove("hidden");
-          if (mode === "give") $("extra-fields").classList.remove("hidden");
-          else $("extra-fields").classList.add("hidden");
-        }
+    // --------- Add car ----------
+    $("btn-add-car").onclick = async () => {
+      if (!session?.user) return alert("Login kerak!");
 
-        // file input click
-        [["box-p1","file-p1"],["box-p2","file-p2"],["box-p3","file-p3"],["box-p4","file-p4"],["box-v1","file-v1"]].forEach(([box,file])=>{
-          $(box).onclick = ()=> $(file).click();
-          $(file).onchange = (e)=>{
-            if (e.target.files.length>0) $(box).classList.add("filled");
-          };
-        });
+      const owner = session.user.id;
+      const title = $("car-title").value.trim();
+      const model = $("car-model").value.trim();
+      const city = $("car-city").value.trim();
+      const price = Number($("car-price").value);
+      const from = $("car-from").value;
+      const to = $("car-to").value;
+      const lat = Number($("car-lat").value);
+      const lng = Number($("car-lng").value);
 
-        $("btn-next").onclick = () => {
-          let allValid = true;
-          const checks = [{ id: "inp-name", type: "name" }, { id: "inp-phone", type: "phone" }];
+      if (!title || !model) return alert("Title + Model kerak");
+      if (!from || !to) return alert("Available dates kerak");
+      if (!Number.isFinite(price) || price <= 0) return alert("Price xato");
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return alert("lat/lng xato");
 
-          if (currentMode === "give") {
-            checks.push(
-              { id: "inp-model", type: "text" },
-              { id: "inp-loc", type: "text" },
-              { id: "inp-mon", type: "number" },
-              { id: "inp-year", type: "number" }
-            );
-            const mediaOk = ["file-p1", "file-p2", "file-p3", "file-p4", "file-v1"].every((id) => $(id).files.length > 0);
-            if (!mediaOk) { $("err-media").style.display = "block"; allValid = false; }
-            else { $("err-media").style.display = "none"; }
-          }
+      const payload = {
+        owner,
+        title,
+        model,
+        country: profile.country,
+        region: profile.region,
+        city: city || null,
+        lat,
+        lng,
+        price_daily: price,
+        available_from: from,
+        available_to: to,
+      };
 
-          checks.forEach((check) => {
-            const el = $(check.id);
-            const val = el.value.trim();
-            let isOk = false;
+      const { error } = await supabase.from("cars2").insert(payload);
+      if (error) {
+        console.error(error);
+        $("addcar-msg").textContent = "Xato: " + error.message;
+        return;
+      }
 
-            if (check.type === "text") isOk = val !== "";
-            else if (check.type === "name") isOk = val.split(" ").length >= 2;
-            else if (check.type === "phone") isOk = /^\d{7,15}$/.test(val);
-            else if (check.type === "number") isOk = !isNaN(val) && parseFloat(val) > 0;
+      $("addcar-msg").textContent = "✅ Car published!";
+      $("car-title").value = "";
+      $("car-model").value = "";
+      $("car-city").value = "";
+      $("car-price").value = "";
+      $("car-from").value = "";
+      $("car-to").value = "";
+      $("car-lat").value = "";
+      $("car-lng").value = "";
 
-            const err = el.nextElementSibling;
-            if (!isOk) { el.classList.add("error"); if (err) err.style.display = "block"; allValid = false; }
-            else { el.classList.remove("error"); if (err) err.style.display = "none"; }
+      await loadCarsNearby();
+    };
+
+    // --------- Cars nearby + map ----------
+    async function loadCarsNearby() {
+      if (!session?.user) return;
+
+      const { data, error } = await supabase
+        .from("cars2")
+        .select("*")
+        .eq("is_active", true)
+        .eq("country", profile.country)
+        .eq("region", profile.region)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      let cars = data || [];
+
+      // nearest sort (geolocation bo‘lsa)
+      if (Number.isFinite(profile.lat) && Number.isFinite(profile.lng)) {
+        cars = cars
+          .map(c => ({ ...c, _km: haversineKm(profile.lat, profile.lng, c.lat, c.lng) }))
+          .sort((a, b) => (a._km ?? 99999) - (b._km ?? 99999));
+      }
+
+      // list render
+      const list = $("cars-list");
+      list.innerHTML = "";
+
+      cars.forEach(c => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.padding = "16px";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div>
+              <b style="font-size:16px;">${c.title}</b>
+              <div style="opacity:.75; font-size:12px; margin-top:4px;">
+                ${c.model} • ${c.country}, ${c.region}${c.city ? ", " + c.city : ""}
+              </div>
+              <div style="opacity:.75; font-size:12px; margin-top:6px;">
+                Available: <b>${c.available_from}</b> → <b>${c.available_to}</b>
+                ${c._km != null ? ` • Distance: <b>${fmt(c._km)} km</b>` : ""}
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:18px;"><b>$${c.price_daily}</b><span style="opacity:.7; font-size:12px;"> /day</span></div>
+              <button class="action-btn" data-book="${c.id}" style="margin-top:10px;">Book</button>
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      // book buttons
+      list.querySelectorAll("[data-book]").forEach(btn => {
+        btn.onclick = async () => {
+          const carId = btn.getAttribute("data-book");
+          const start = prompt("Start date (YYYY-MM-DD)?");
+          const end = prompt("End date (YYYY-MM-DD)?");
+          if (!start || !end) return;
+
+          const { error } = await supabase.from("bookings").insert({
+            car_id: carId,
+            renter: session.user.id,
+            start_date: start,
+            end_date: end,
+            status: "requested",
           });
 
-          if (!allValid) return;
-
-          isRegistered = true;
-          userData.name = $("inp-name").value;
-          userData.phone = $("country-code-btn").innerText + " " + $("inp-phone").value;
-
-          $("prof-name").innerText = userData.name;
-          $("prof-phone").innerText = userData.phone;
-          $("txt-login").innerText = userData.name.split(" ")[0];
-
-          $("guest-profile").classList.add("hidden");
-          $("user-profile").classList.remove("hidden");
-
-          if (currentMode === "take") {
-            $("form-register").classList.add("hidden");
-            $("car-results").classList.remove("hidden");
-          } else {
-            alert("Success!");
-            goHome();
+          if (error) {
+            alert("Booking xato: " + error.message);
+            return;
           }
+          alert("✅ Booking sent (requested)!");
+          loadBookings();
         };
+      });
 
-        $("btn-logout").onclick = () => location.reload();
+      // Map init (Leaflet yuklangandan keyin)
+      const waitLeaflet = () => new Promise((res) => {
+        const t = setInterval(() => {
+          if (window.L) { clearInterval(t); res(true); }
+        }, 50);
+      });
 
-      } catch (err) {
-        console.error("TEMURrentUZ ERROR ❌", err);
-        alert("Console’da xato chiqdi. F12 → Console’ni ochib errorni yubor.");
+      await waitLeaflet();
+
+      if (!map) {
+        map = L.map("map").setView(
+          Number.isFinite(profile.lat) ? [profile.lat, profile.lng] : [41.311, 69.279],
+          11
+        );
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap"
+        }).addTo(map);
       }
-    })();
-  </script>
+
+      // clear markers
+      markers.forEach(m => m.remove());
+      markers = [];
+
+      // user marker
+      if (Number.isFinite(profile.lat) && Number.isFinite(profile.lng)) {
+        const me = L.marker([profile.lat, profile.lng]).addTo(map).bindPopup("You are here");
+        markers.push(me);
+      }
+
+      cars.forEach(c => {
+        const m = L.marker([c.lat, c.lng])
+          .addTo(map)
+          .bindPopup(`<b>${c.title}</b><br>${c.model}<br>$${c.price_daily}/day`);
+        markers.push(m);
+      });
+    }
+
+    // --------- Bookings (renter + owner) ----------
+    async function loadBookings() {
+      if (!session?.user) return;
+
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("*, cars2:car_id (title, model, owner)")
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const list = $("bookings-list");
+      list.innerHTML = "";
+
+      (data || []).forEach(b => {
+        const car = b.cars2;
+        const isOwner = car?.owner === session.user.id;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.padding = "14px";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div>
+              <b>${car?.title || "Car"}</b> <span style="opacity:.7;">(${car?.model || ""})</span>
+              <div style="opacity:.75; font-size:12px; margin-top:4px;">
+                ${b.start_date} → ${b.end_date} • status: <b>${b.status}</b>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              ${isOwner && b.status === "requested" ? `
+                <button class="action-btn" data-approve="${b.id}" style="background:rgba(16,185,129,.25);">Approve</button>
+                <button class="action-btn" data-reject="${b.id}" style="background:rgba(239,68,68,.25);">Reject</button>
+              ` : ""}
+              ${(!isOwner && (b.status === "requested" || b.status === "approved")) ? `
+                <button class="action-btn" data-cancel="${b.id}" style="background:rgba(239,68,68,.25);">Cancel</button>
+              ` : ""}
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      // actions
+      list.querySelectorAll("[data-approve]").forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.getAttribute("data-approve");
+          const { error } = await supabase.from("bookings").update({ status: "approved" }).eq("id", id);
+          if (error) return alert(error.message);
+          loadBookings();
+        };
+      });
+
+      list.querySelectorAll("[data-reject]").forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.getAttribute("data-reject");
+          const { error } = await supabase.from("bookings").update({ status: "rejected" }).eq("id", id);
+          if (error) return alert(error.message);
+          loadBookings();
+        };
+      });
+
+      list.querySelectorAll("[data-cancel]").forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.getAttribute("data-cancel");
+          const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
+          if (error) return alert(error.message);
+          loadBookings();
+        };
+      });
+    }
+
+    // --------- Start ----------
+    showDash();
+
+    supabase.auth.onAuthStateChange(() => {
+      refreshSession();
+    });
+
+    refreshSession();
+  })();
+</script>
+
 </Layout>
