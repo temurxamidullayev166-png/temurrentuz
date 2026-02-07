@@ -1,156 +1,159 @@
 ---
-import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="TEMURrentUZ - Global Auto Rental">
-  <!-- Font Awesome (ikonlar uchun) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+  :root {
+    --primary: #3b82f6;
+    --secondary: #10b981;
+    --dark: #070b14;
+    --card-bg: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.1);
+    --error: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: Inter, system-ui, Arial, sans-serif; }
+  body { background: radial-gradient(circle at top right, #1e293b, #070b14); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
 
-  <style>
-    :root {
-      --primary: #3b82f6;
-      --secondary: #10b981;
-      --dark: #070b14;
-      --card-bg: rgba(255, 255, 255, 0.06);
-      --border: rgba(255, 255, 255, 0.1);
-      --error: #ef4444;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background: radial-gradient(circle at top right, #1e293b, #070b14); color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
+  #overlay-screen, #country-overlay, #profile-overlay {
+    position: fixed; inset: 0; background: var(--dark); z-index: 1000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  #profile-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(15px); z-index: 1200; }
+  #country-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(10px); z-index: 1100; }
 
-    #overlay-screen, #country-overlay, #profile-overlay {
-      position: fixed; inset: 0; background: var(--dark); z-index: 1000;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    #profile-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(15px); z-index: 1200; }
-    #country-overlay { background: rgba(7, 11, 20, 0.95); backdrop-filter: blur(10px); z-index: 1100; }
+  .scroll-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px; max-width: 1000px; width: 90%; margin-top: 20px;
+    max-height: 70vh; overflow-y: auto; padding: 20px;
+  }
+  .action-btn {
+    padding: 12px; background: var(--card-bg); border: 1px solid var(--border);
+    color: white; border-radius: 12px; cursor: pointer; transition: 0.3s;
+    font-size: 14px; text-align: center;
+  }
+  .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
 
-    .scroll-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px; max-width: 1000px; width: 90%; margin-top: 20px;
-      max-height: 70vh; overflow-y: auto; padding: 20px;
-    }
-    .action-btn {
-      padding: 12px; background: var(--card-bg); border: 1px solid var(--border);
-      color: white; border-radius: 12px; cursor: pointer; transition: 0.3s;
-      font-size: 14px; text-align: center;
-    }
-    .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
+  header {
+    padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
+    background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+  }
 
-    header {
-      padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
-      background: rgba(7, 11, 20, 0.8); backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
-    }
+  .logo {
+    font-size: 26px; font-weight: 900;
+    background: linear-gradient(to right, #3b82f6, #60a5fa);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    display: inline-block; cursor: pointer;
+  }
 
-    .logo {
-      font-size: 26px; font-weight: 900;
-      background: linear-gradient(to right, #3b82f6, #60a5fa);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent; color: transparent;
-      display: inline-block; cursor: pointer;
-    }
+  .profile-trigger { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 20px; transition: 0.3s; }
+  .profile-trigger:hover { background: var(--card-bg); }
 
-    .profile-trigger { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 20px; transition: 0.3s; }
-    .profile-trigger:hover { background: var(--card-bg); }
+  .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+  .card { background: var(--card-bg); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 30px; padding: 35px; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-    .card { background: var(--card-bg); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 30px; padding: 35px; animation: fadeIn 0.5s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  .choice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .choice-card { padding: 40px 20px; text-align: center; border-radius: 25px; cursor: pointer; transition: 0.4s; border: 1px solid var(--border); background: var(--card-bg); }
+  .choice-card:hover { border-color: var(--primary); transform: translateY(-5px); }
 
-    .choice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .choice-card { padding: 40px 20px; text-align: center; border-radius: 25px; cursor: pointer; transition: 0.4s; border: 1px solid var(--border); background: var(--card-bg); }
-    .choice-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+  .input-group { margin-bottom: 15px; position: relative; }
+  input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; transition: 0.3s; }
+  input.error { border-color: var(--error); box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+  .error-text { color: var(--error); font-size: 11px; margin-top: 4px; display: none; }
 
-    .input-group { margin-bottom: 15px; position: relative; }
-    input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(15, 23, 42, 0.6); color: white; outline: none; transition: 0.3s; }
-    input.error { border-color: var(--error); box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
-    .error-text { color: var(--error); font-size: 11px; margin-top: 4px; display: none; }
+  .media-upload { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; margin-bottom: 5px; }
+  .media-box { background: rgba(255,255,255,0.05); border: 1px dashed var(--border); border-radius: 10px; height: 60px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; position: relative; transition: 0.3s; }
+  .media-box.error { border-color: var(--error); }
+  .media-box.filled { border-color: var(--secondary); color: var(--secondary); }
 
-    .hidden { display: none !important; }
-    .btn-submit { width: 100%; padding: 16px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 15px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+  .hidden { display: none !important; }
+  .btn-submit { width: 100%; padding: 16px; background: var(--primary); border: none; color: white; font-weight: bold; border-radius: 15px; cursor: pointer; font-size: 16px; margin-top: 10px; }
 
-    .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 340px; text-align: center; }
-    .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 15px; }
-    .menu-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; text-align: left; width: 100%; background: none; color: white; border: none; }
-    .menu-item:hover { background: rgba(255,255,255,0.05); }
+  .profile-menu-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 25px; width: 320px; text-align: center; }
+  .profile-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 0 auto 15px; }
+  .menu-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; text-align: left; width: 100%; background: none; color: white; border: none; }
+  .menu-item:hover { background: rgba(255,255,255,0.05); }
+</style>
 
-    .car-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
-    .car-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
-    .car-item h3 { font-size: 16px; margin-bottom: 6px; }
-    .car-item p { font-size: 13px; opacity: 0.75; margin: 3px 0; }
-  </style>
+<!-- Overlay Language -->
+<div id="overlay-screen">
+  <div class="logo" style="margin-bottom: 20px; font-size: 32px;">TEMURrentUZ</div>
+  <h2 id="overlay-title">Select Language</h2>
+  <div class="scroll-grid" id="overlay-content"></div>
+</div>
 
-  <!-- Til overlay -->
-  <div id="overlay-screen">
-    <div class="logo" style="margin-bottom: 20px; font-size: 32px;">TEMURrentUZ</div>
-    <h2 id="overlay-title">Select Language</h2>
-    <div class="scroll-grid" id="overlay-content"></div>
+<!-- Country picker -->
+<div id="country-overlay" class="hidden">
+  <h2>Select Country</h2>
+  <div class="scroll-grid" id="country-content"></div>
+  <button id="btn-cancel-country" class="action-btn" style="margin-top: 20px; background: #ef4444;">Cancel</button>
+</div>
+
+<!-- Profile -->
+<div id="profile-overlay" class="hidden">
+  <div class="profile-menu-card">
+    <div id="guest-profile">
+      <div class="profile-avatar" style="background: #64748b;"><i class="fas fa-user-secret"></i></div>
+      <h3>Guest Mode</h3>
+      <p style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">You are not logged in</p>
+      <button class="menu-item" id="btn-profile-home"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
+      <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
+    </div>
+
+    <div id="user-profile" class="hidden">
+      <div class="profile-avatar"><i class="fas fa-user"></i></div>
+      <h3 id="prof-name">User Name</h3>
+      <p id="prof-phone" style="font-size: 12px; opacity: 0.6; margin-bottom: 20px;">+998 00 000 00 00</p>
+      <button class="menu-item"><i class="fas fa-shield-alt"></i> Security & Privacy</button>
+      <button class="menu-item"><i class="fas fa-cog"></i> Settings</button>
+      <button class="menu-item" style="color: #ef4444;" id="btn-logout"><i class="fas fa-power-off"></i> Logout</button>
+    </div>
+
+    <button class="action-btn" id="btn-close-profile" style="margin-top: 20px; width: 100%;">Close</button>
+  </div>
+</div>
+
+<header>
+  <div class="logo" id="logo-btn">TEMURrentUZ</div>
+  <div class="profile-trigger" id="profile-trigger">
+    <i class="fas fa-user-circle fa-lg"></i>
+    <span id="txt-login">Login</span>
+  </div>
+</header>
+
+<div class="container">
+  <div id="step-choice" class="choice-btns">
+    <div class="choice-card" id="btn-give">
+      <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+      <h3 id="txt-give">Rent Out</h3>
+      <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
+    </div>
+
+    <div class="choice-card" id="btn-take">
+      <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
+      <h3 id="txt-take">Rent In</h3>
+      <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
+    </div>
   </div>
 
-  <!-- Profil overlay -->
-  <div id="profile-overlay" class="hidden">
-    <div class="profile-menu-card">
-      <div id="guest-profile">
-        <div class="profile-avatar" style="background: #64748b;"><i class="fas fa-user-secret"></i></div>
-        <h3>Guest Mode</h3>
-        <p style="font-size: 12px; opacity: 0.6; margin-bottom: 16px;">You are not logged in</p>
+  <div id="form-register" class="card hidden">
+    <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
 
-        <button class="menu-item" onclick="openAuthPopup()">
-          <i class="fas fa-sign-in-alt"></i> Login / Register
-        </button>
-      </div>
-
-      <div id="user-profile" class="hidden">
-        <div class="profile-avatar"><i class="fas fa-user"></i></div>
-        <h3 id="prof-name">User</h3>
-        <p id="prof-email" style="font-size: 12px; opacity: 0.6; margin-bottom: 16px;">email</p>
-
-        <button class="menu-item" onclick="logoutNow()" style="color: #ef4444;">
-          <i class="fas fa-power-off"></i> Logout
-        </button>
-      </div>
-
-      <button class="action-btn" onclick="closeProfile()" style="margin-top: 14px; width: 100%;">Close</button>
-    </div>
-  </div>
-
-  <header>
-    <div class="logo" onclick="goHome()">TEMURrentUZ</div>
-    <div class="profile-trigger" onclick="openProfile()">
-      <i class="fas fa-user-circle fa-lg"></i>
-      <span id="txt-login">Login</span>
-    </div>
-  </header>
-
-  <div class="container">
-    <div id="step-choice" class="choice-btns">
-      <div class="choice-card" onclick="showRegistration('give')">
-        <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
-        <h3 id="txt-give">Rent Out</h3>
-        <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
-      </div>
-
-      <div class="choice-card" onclick="showRegistration('take')">
-        <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
-        <h3 id="txt-take">Rent In</h3>
-        <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
-      </div>
+    <div class="input-group">
+      <input type="text" id="inp-name" placeholder="Full Name (e.g. John Doe)">
+      <div class="error-text">Invalid name (Enter first and last name)</div>
     </div>
 
-    <div id="form-register" class="card hidden">
-      <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Post a car</h2>
-
-      <div class="input-group">
-        <input type="text" id="inp-name" placeholder="Full Name (e.g. John Doe)">
-        <div class="error-text">Invalid name (Enter first and last name)</div>
-      </div>
-
-      <div class="input-group">
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+      <button id="country-code-btn" style="flex: 0.35; height: 50px;" class="action-btn">+998</button>
+      <div class="input-group" style="flex: 1; margin-bottom: 0;">
         <input type="text" id="inp-phone" placeholder="Phone (901234567)">
         <div class="error-text">Invalid phone number</div>
       </div>
+    </div>
 
+    <div id="extra-fields" class="hidden">
       <div class="input-group">
         <input type="text" id="inp-model" placeholder="Car Model">
         <div class="error-text">Model required</div>
@@ -161,7 +164,7 @@ import Layout from "../layouts/Layout.astro";
         <div class="error-text">Location required</div>
       </div>
 
-      <div style="display:flex; gap:10px;">
+      <div style="display: flex; gap: 10px;">
         <div class="input-group" style="flex:1">
           <input type="number" id="inp-mon" placeholder="Monthly ($)">
           <div class="error-text">Invalid price</div>
@@ -172,246 +175,278 @@ import Layout from "../layouts/Layout.astro";
         </div>
       </div>
 
-      <button class="btn-submit" id="btn-next" onclick="handleFormSubmit()">Post Ad</button>
-      <p onclick="goHome()" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;" id="txt-back">← Back</p>
+      <div class="media-upload">
+        <div class="media-box" id="box-p1"><i class="fas fa-camera"></i><input type="file" id="file-p1" class="hidden" /></div>
+        <div class="media-box" id="box-p2"><i class="fas fa-camera"></i><input type="file" id="file-p2" class="hidden" /></div>
+        <div class="media-box" id="box-p3"><i class="fas fa-camera"></i><input type="file" id="file-p3" class="hidden" /></div>
+        <div class="media-box" id="box-p4"><i class="fas fa-camera"></i><input type="file" id="file-p4" class="hidden" /></div>
+        <div class="media-box" id="box-v1" style="border-style: solid;"><i class="fas fa-video"></i><input type="file" id="file-v1" class="hidden" /></div>
+      </div>
+
+      <div class="error-text" id="err-media" style="margin-bottom: 15px;">Please upload all 4 photos and 1 video</div>
     </div>
 
-    <div id="car-results" class="hidden">
-      <h2 id="txt-title-take">Available Cars</h2>
-      <div class="car-grid" id="car-grid"></div>
-      <button class="action-btn" style="margin-top: 14px;" onclick="goHome()">← Back</button>
-    </div>
+    <button class="btn-submit" id="btn-next">Continue</button>
+    <p id="txt-back" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;">← Back</p>
   </div>
 
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <div id="car-results" class="hidden">
+    <h2 id="txt-title-take">Available Cars</h2>
+    <div class="car-grid">
+      <div class="car-item"><h3>Chevrolet Tahoe</h3><p>$1200/mo</p></div>
+    </div>
+  </div>
+</div>
 
-  <script is:inline>
-    // =========================
-    // 1) SUPABASE SETTINGS (BU 2 TASINI O'ZGARTIR!)
-    // =========================
-    const SUPABASE_URL = "PASTE_SUPABASE_URL_HERE";
-    const SUPABASE_ANON_KEY = "PASTE_SUPABASE_ANON_KEY_HERE";
+<!-- Supabase (hozircha tayyor, keyin URL/KEY qo‘shamiz) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    // ====== STATE ======
+    let isRegistered = false;
+    let userData = { name: "", phone: "" };
+    let currentMode = "";
 
-    // =========================
-    // 2) UI helpers
-    // =========================
-    function openProfile() { document.getElementById('profile-overlay').classList.remove('hidden'); }
-    function closeProfile() { document.getElementById('profile-overlay').classList.add('hidden'); }
-
-    function show(elId) { document.getElementById(elId).classList.remove('hidden'); }
-    function hide(elId) { document.getElementById(elId).classList.add('hidden'); }
-
-    function goHome() {
-      hide('form-register');
-      hide('car-results');
-      show('step-choice');
-      closeProfile();
-    }
-
-    // =========================
-    // 3) Language overlay (minimal)
-    // =========================
+    // ====== TRANSLATIONS ======
     const translations = {
-      "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", post: "E'lon berish", cars: "Mashinalar" },
-      "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", post: "Post a car", cars: "Available Cars" }
+      "O'zbek": { login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish", givesub: "Mashina qo'shish", takesub: "Mashina qidirish", submit: "Joylash", back: "← Orqaga" },
+      "English": { login: "Login", give: "Rent Out", take: "Rent In", givesub: "Add a car", takesub: "Search car", submit: "Post Ad", back: "← Back" },
+      "Русский": { login: "Вход", give: "Сдать", take: "Снять", givesub: "Добавить авто", takesub: "Поиск авто", submit: "Разместить", back: "← Назад" },
+      "Türkçe": { login: "Giriş", give: "Kiraya Ver", take: "Kiralık Al", givesub: "Araba Ekle", takesub: "Araba Ara", submit: "Yayınla", back: "← Geri" },
+      "Deutsch": { login: "Anmelden", give: "Vermieten", take: "Mieten", givesub: "Auto hinzufügen", takesub: "Auto suchen", submit: "Senden", back: "← Zurück" },
+      "Français": { login: "Connexion", give: "Louer", take: "Prendre", givesub: "Ajouter", takesub: "Chercher", submit: "Publier", back: "← Retour" }
     };
 
-    const overlayContent = document.getElementById('overlay-content');
-    Object.keys(translations).forEach(l => {
-      const b = document.createElement('button');
-      b.className = "action-btn";
-      b.innerText = l;
-      b.onclick = () => setLang(l);
-      overlayContent.appendChild(b);
-    });
+    const countries = [
+      { n: "Uzbekistan", c: "+998" }, { n: "USA", c: "+1" }, { n: "Russia", c: "+7" },
+      { n: "Turkey", c: "+90" }, { n: "Germany", c: "+49" }, { n: "UK", c: "+44" },
+      { n: "UAE", c: "+971" }, { n: "Kazakhstan", c: "+7" }, { n: "Kyrgyzstan", c: "+996" },
+      { n: "Tajikistan", c: "+992" }, { n: "S. Korea", c: "+82" }, { n: "Poland", c: "+48" },
+      { n: "France", c: "+33" }, { n: "Italy", c: "+39" }, { n: "Egypt", c: "+20" },
+      { n: "India", c: "+91" }, { n: "Japan", c: "+81" }, { n: "China", c: "+86" }
+    ];
 
-    function setLang(lang) {
-      const t = translations[lang];
-      document.getElementById('txt-login').innerText = t.login;
-      document.getElementById('txt-give').innerText = t.give;
-      document.getElementById('txt-take').innerText = t.take;
-      document.getElementById('txt-givesub').innerText = t.givesub;
-      document.getElementById('txt-takesub').innerText = t.takesub;
-      document.getElementById('reg-title').innerText = t.post;
-      document.getElementById('txt-title-take').innerText = t.cars;
-      document.getElementById('overlay-screen').style.display = "none";
-    }
+    // ====== ELEMENTS ======
+    const overlayScreen = document.getElementById("overlay-screen");
+    const overlayContent = document.getElementById("overlay-content");
 
-    // =========================
-    // 4) Auth (email+password)
-    // =========================
-    async function getUser() {
-      const { data } = await supabase.auth.getUser();
-      return data?.user || null;
-    }
+    const countryOverlay = document.getElementById("country-overlay");
+    const countryContent = document.getElementById("country-content");
+    const countryBtn = document.getElementById("country-code-btn");
+    const btnCancelCountry = document.getElementById("btn-cancel-country");
 
-    async function refreshProfileUI() {
-      const user = await getUser();
-      if (!user) {
-        document.getElementById('txt-login').innerText = "Login";
-        document.getElementById('guest-profile').classList.remove('hidden');
-        document.getElementById('user-profile').classList.add('hidden');
-        return;
-      }
+    const profileOverlay = document.getElementById("profile-overlay");
+    const profileTrigger = document.getElementById("profile-trigger");
+    const btnCloseProfile = document.getElementById("btn-close-profile");
+    const btnLogout = document.getElementById("btn-logout");
+    const btnProfileHome = document.getElementById("btn-profile-home");
 
-      document.getElementById('txt-login').innerText = user.email;
-      document.getElementById('prof-name').innerText = "Account";
-      document.getElementById('prof-email').innerText = user.email;
-      document.getElementById('guest-profile').classList.add('hidden');
-      document.getElementById('user-profile').classList.remove('hidden');
-    }
+    const stepChoice = document.getElementById("step-choice");
+    const formRegister = document.getElementById("form-register");
+    const extraFields = document.getElementById("extra-fields");
+    const carResults = document.getElementById("car-results");
 
-    async function openAuthPopup() {
-      const email = prompt("Email:");
-      const password = prompt("Password (kamida 6 ta belgi):");
-      if (!email || !password) return;
+    const inpName = document.getElementById("inp-name");
+    const inpPhone = document.getElementById("inp-phone");
+    const inpModel = document.getElementById("inp-model");
+    const inpLoc = document.getElementById("inp-loc");
+    const inpMon = document.getElementById("inp-mon");
+    const inpYear = document.getElementById("inp-year");
 
-      // avval login
-      let { error } = await supabase.auth.signInWithPassword({ email, password });
+    const errMedia = document.getElementById("err-media");
 
-      // login bo'lmasa -> signUp taklif
-      if (error) {
-        const ok = confirm("Login bo'lmadi. Yangi akkaunt ochaymi?");
-        if (!ok) return;
-        const res = await supabase.auth.signUp({ email, password });
-        if (res.error) return alert(res.error.message);
-        alert("Akkaunt yaratildi! Endi login qilib ko'ring (email tasdiqlash yoqilgan bo'lishi mumkin).");
-      } else {
-        alert("Login bo'ldi ✅");
-      }
+    const txtLogin = document.getElementById("txt-login");
+    const txtGive = document.getElementById("txt-give");
+    const txtTake = document.getElementById("txt-take");
+    const txtGiveSub = document.getElementById("txt-givesub");
+    const txtTakeSub = document.getElementById("txt-takesub");
+    const txtBack = document.getElementById("txt-back");
+    const btnNext = document.getElementById("btn-next");
 
-      await refreshProfileUI();
+    const profName = document.getElementById("prof-name");
+    const profPhone = document.getElementById("prof-phone");
+    const guestProfile = document.getElementById("guest-profile");
+    const userProfile = document.getElementById("user-profile");
+
+    // file boxes
+    const fileMap = [
+      { box: "box-p1", file: "file-p1" },
+      { box: "box-p2", file: "file-p2" },
+      { box: "box-p3", file: "file-p3" },
+      { box: "box-p4", file: "file-p4" },
+      { box: "box-v1", file: "file-v1" }
+    ];
+
+    // ====== HELPERS ======
+    function openProfile() { profileOverlay.classList.remove("hidden"); }
+    function closeProfile() { profileOverlay.classList.add("hidden"); }
+
+    function goHome() {
+      document.querySelectorAll("input").forEach(i => i.classList.remove("error"));
+      document.querySelectorAll(".error-text").forEach(e => e.style.display = "none");
+      formRegister.classList.add("hidden");
+      carResults.classList.add("hidden");
+      stepChoice.classList.remove("hidden");
       closeProfile();
     }
-
-    async function logoutNow() {
-      await supabase.auth.signOut();
-      await refreshProfileUI();
-      closeProfile();
-      alert("Logout ✅");
-    }
-
-    // =========================
-    // 5) App logic
-    // =========================
-    let currentMode = '';
 
     function showRegistration(mode) {
       currentMode = mode;
-
-      if (mode === 'give') {
-        hide('step-choice');
-        hide('car-results');
-        show('form-register');
-      } else {
-        // take
-        loadCars();
-      }
+      stepChoice.classList.add("hidden");
+      formRegister.classList.remove("hidden");
+      if (mode === "give") extraFields.classList.remove("hidden");
+      else extraFields.classList.add("hidden");
     }
 
-    function markError(inputId, isError) {
-      const el = document.getElementById(inputId);
-      const err = el.nextElementSibling;
-      if (isError) { el.classList.add('error'); err.style.display = 'block'; }
-      else { el.classList.remove('error'); err.style.display = 'none'; }
+    function openCountryPicker() { countryOverlay.classList.remove("hidden"); }
+    function closeCountryPicker() { countryOverlay.classList.add("hidden"); }
+    function selectCountry(code) { countryBtn.innerText = code; closeCountryPicker(); }
+
+    function setLang(lang) {
+      const t = translations[lang] || translations["English"];
+      txtLogin.innerText = isRegistered ? userData.name.split(" ")[0] : t.login;
+      txtGive.innerText = t.give;
+      txtTake.innerText = t.take;
+      txtGiveSub.innerText = t.givesub;
+      txtTakeSub.innerText = t.takesub;
+      btnNext.innerText = t.submit;
+      txtBack.innerText = t.back;
+      overlayScreen.style.display = "none";
     }
 
-    async function handleFormSubmit() {
-      const user = await getUser();
-      if (!user) {
-        alert("Avval Login qiling!");
-        openProfile();
-        return;
-      }
-
-      const name = document.getElementById('inp-name').value.trim();
-      const phone = document.getElementById('inp-phone').value.trim();
-      const model = document.getElementById('inp-model').value.trim();
-      const location = document.getElementById('inp-loc').value.trim();
-      const monthly = Number(document.getElementById('inp-mon').value);
-      const yearly = Number(document.getElementById('inp-year').value);
-
-      let ok = true;
-      markError('inp-name', !(name.split(' ').length >= 2)); if (!(name.split(' ').length >= 2)) ok = false;
-      markError('inp-phone', !(/^\d{7,15}$/.test(phone))); if (!(/^\d{7,15}$/.test(phone))) ok = false;
-      markError('inp-model', !(model !== "")); if (!(model !== "")) ok = false;
-      markError('inp-loc', !(location !== "")); if (!(location !== "")) ok = false;
-      markError('inp-mon', !(monthly > 0)); if (!(monthly > 0)) ok = false;
-      markError('inp-year', !(yearly > 0)); if (!(yearly > 0)) ok = false;
-
-      if (!ok) return;
-
-      const { error } = await supabase.from("cars").insert({
-        user_id: user.id,
-        name,
-        phone,
-        model,
-        location,
-        monthly,
-        yearly
-      });
-
-      if (error) {
-        alert("DB error: " + error.message);
-        return;
-      }
-
-      alert("E'lon saqlandi ✅");
+    function handleLogoClick() {
+      if (!isRegistered) overlayScreen.style.display = "flex";
       goHome();
     }
 
-    async function loadCars() {
-      hide('step-choice');
-      hide('form-register');
-      show('car-results');
-
-      const grid = document.getElementById('car-grid');
-      grid.innerHTML = "<p style='opacity:.7'>Loading...</p>";
-
-      const { data, error } = await supabase
-        .from("cars")
-        .select("model, location, monthly, yearly, name, phone, created_at")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) {
-        grid.innerHTML = "";
-        alert("Load error: " + error.message);
-        return;
+    function checkFileFilled(inputEl) {
+      const box = inputEl.parentElement;
+      if (inputEl.files && inputEl.files.length > 0) {
+        box.classList.add("filled");
+        box.classList.remove("error");
       }
-
-      if (!data || data.length === 0) {
-        grid.innerHTML = "<p style='opacity:.7'>Hali e'lon yo'q.</p>";
-        return;
-      }
-
-      grid.innerHTML = data.map(c => `
-        <div class="car-item">
-          <h3>${escapeHtml(c.model)}</h3>
-          <p><b>Location:</b> ${escapeHtml(c.location)}</p>
-          <p><b>Monthly:</b> $${Number(c.monthly).toFixed(0)}</p>
-          <p><b>Yearly:</b> $${Number(c.yearly).toFixed(0)}</p>
-          <p style="margin-top:8px; opacity:.6"><b>Owner:</b> ${escapeHtml(c.name)} (${escapeHtml(c.phone)})</p>
-        </div>
-      `).join("");
     }
 
-    function escapeHtml(s) {
-      return String(s ?? "").replace(/[&<>"']/g, (m) => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-      }[m]));
+    function handleFormSubmit() {
+      let allValid = true;
+
+      // media
+      if (currentMode === "give") {
+        const mediaOk = fileMap.every(x => {
+          const f = document.getElementById(x.file);
+          return f.files && f.files.length > 0;
+        });
+        if (!mediaOk) { errMedia.style.display = "block"; allValid = false; }
+        else errMedia.style.display = "none";
+      }
+
+      // checks
+      const checks = [
+        { el: inpName, type: "name" },
+        { el: inpPhone, type: "phone" }
+      ];
+      if (currentMode === "give") {
+        checks.push(
+          { el: inpModel, type: "text" },
+          { el: inpLoc, type: "text" },
+          { el: inpMon, type: "number" },
+          { el: inpYear, type: "number" }
+        );
+      }
+
+      checks.forEach(({ el, type }) => {
+        if (!el) return;
+        const val = (el.value || "").trim();
+        let ok = false;
+
+        if (type === "text") ok = val !== "";
+        if (type === "name") ok = val.split(" ").filter(Boolean).length >= 2;
+        if (type === "phone") ok = /^\d{7,15}$/.test(val);
+        if (type === "number") ok = val !== "" && !isNaN(val) && Number(val) > 0;
+
+        const err = el.nextElementSibling;
+        if (!ok) {
+          el.classList.add("error");
+          if (err) err.style.display = "block";
+          allValid = false;
+        } else {
+          el.classList.remove("error");
+          if (err) err.style.display = "none";
+        }
+      });
+
+      if (!allValid) return;
+
+      // success
+      isRegistered = true;
+      userData.name = inpName.value.trim();
+      userData.phone = countryBtn.innerText + " " + inpPhone.value.trim();
+
+      profName.innerText = userData.name;
+      profPhone.innerText = userData.phone;
+      txtLogin.innerText = userData.name.split(" ")[0];
+
+      guestProfile.classList.add("hidden");
+      userProfile.classList.remove("hidden");
+
+      if (currentMode === "take") {
+        formRegister.classList.add("hidden");
+        carResults.classList.remove("hidden");
+      } else {
+        alert("Success!");
+        goHome();
+      }
     }
 
-    // =========================
-    // 6) Init
-    // =========================
-    (async () => {
-      await refreshProfileUI();
-      // Agar xohlasang, til overlayni avtomatik yashirish uchun:
-      // document.getElementById('overlay-screen').style.display = "none";
-    })();
-  </script>
-</Layout>
+    // ====== BUILD LANGUAGE BUTTONS ======
+    overlayContent.innerHTML = "";
+    Object.keys(translations).forEach(lang => {
+      const b = document.createElement("button");
+      b.className = "action-btn";
+      b.innerText = lang;
+      b.onclick = () => setLang(lang);
+      overlayContent.appendChild(b);
+    });
+
+    // ====== BUILD COUNTRY BUTTONS ======
+    countryContent.innerHTML = "";
+    countries.forEach(country => {
+      const b = document.createElement("button");
+      b.className = "action-btn";
+      b.innerHTML = `<b>${country.c}</b><br><small>${country.n}</small>`;
+      b.onclick = () => selectCountry(country.c);
+      countryContent.appendChild(b);
+    });
+
+    // ====== EVENTS ======
+    document.getElementById("logo-btn").addEventListener("click", handleLogoClick);
+    profileTrigger.addEventListener("click", openProfile);
+    btnCloseProfile.addEventListener("click", closeProfile);
+
+    btnProfileHome.addEventListener("click", () => { goHome(); closeProfile(); });
+
+    btnLogout.addEventListener("click", () => location.reload());
+
+    document.getElementById("btn-give").addEventListener("click", () => showRegistration("give"));
+    document.getElementById("btn-take").addEventListener("click", () => showRegistration("take"));
+    btnNext.addEventListener("click", handleFormSubmit);
+    txtBack.addEventListener("click", goHome);
+
+    countryBtn.addEventListener("click", openCountryPicker);
+    btnCancelCountry.addEventListener("click", closeCountryPicker);
+
+    // file events
+    fileMap.forEach(x => {
+      const box = document.getElementById(x.box);
+      const file = document.getElementById(x.file);
+      if (!box || !file) return;
+
+      box.addEventListener("click", () => file.click());
+      file.addEventListener("change", () => checkFileFilled(file));
+    });
+
+    // default til
+    setLang("English");
+  });
+</script>
