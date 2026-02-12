@@ -2,178 +2,143 @@
 /* Astro frontmatter bo‘sh */
 ---
 
+
 <!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TEMURrentUZ - Global Auto Rental</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
-    :root {
-      --primary: #3b82f6;
-      --secondary: #10b981;
-      --dark: #070b14;
-      --card-bg: rgba(255, 255, 255, 0.06);
-      --border: rgba(255, 255, 255, 0.1);
+    :root{
+      --primary:#3b82f6;
+      --secondary:#10b981;
+      --dark:#070b14;
+      --card-bg:rgba(255,255,255,0.06);
+      --border:rgba(255,255,255,0.1);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif}
+    body{
+      background:radial-gradient(circle at top right,#1e293b,#070b14);
+      color:#f8fafc;min-height:100vh;overflow-x:hidden;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body {
-      background: radial-gradient(circle at top right, #1e293b, #070b14);
-      color: #f8fafc;
-      min-height: 100vh;
-      overflow-x: hidden;
+    /* ===== Overlay System ===== */
+    #overlay-screen{
+      position:fixed;inset:0;background:var(--dark);z-index:1000;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      transition:.5s ease;padding:20px;
+    }
+    .overlay-top{
+      width:min(1100px,95%);
+      display:flex;gap:12px;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    #overlay-title{font-size:20px;font-weight:800;letter-spacing:-.5px}
+    .overlay-search{
+      width:min(520px,100%);
+      display:flex;gap:10px;align-items:center;
+    }
+    .overlay-search input{
+      width:100%;
+      padding:12px 14px;border-radius:12px;border:1px solid var(--border);
+      background:rgba(15,23,42,.6);color:white;outline:none;
     }
 
-    /* ===== Overlay System (til + country code) ===== */
-    #overlay-screen {
-      position: fixed;
-      inset: 0;
-      background: var(--dark);
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: 0.5s ease;
-      padding: 20px;
+    .scroll-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+      gap:15px;max-width:1100px;width:95%;margin-top:18px;
+      max-height:70vh;overflow-y:auto;padding:10px;
     }
-
-    .scroll-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-      max-width: 1100px;
-      width: 95%;
-      margin-top: 20px;
-      max-height: 70vh;
-      overflow-y: auto;
-      padding: 15px;
+    .action-btn{
+      padding:12px;background:var(--card-bg);border:1px solid var(--border);
+      color:white;border-radius:12px;cursor:pointer;transition:.25s;
+      font-size:14px;text-align:left;display:flex;gap:10px;align-items:center;
+      user-select:none;
     }
-
-    .action-btn {
-      padding: 12px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: white;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 14px;
-      text-align: center;
-      user-select: none;
+    .action-btn:hover{background:var(--primary);transform:translateY(-3px)}
+    .badge{
+      margin-left:auto;
+      font-size:12px;opacity:.85;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      padding:2px 8px;border-radius:999px;
     }
-    .action-btn:hover { background: var(--primary); transform: translateY(-3px); }
 
     /* ===== Header ===== */
-    header {
-      padding: 16px 5%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(7, 11, 20, 0.8);
-      backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    header{
+      padding:16px 5%;display:flex;justify-content:space-between;align-items:center;
+      background:rgba(7,11,20,.8);backdrop-filter:blur(15px);
+      border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+    }
+    .logo img{height:70px;object-fit:contain;display:block;transition:.2s}
+    .logo img:hover{transform:scale(1.04)}
+
+    .container{max-width:1000px;margin:40px auto;padding:0 20px}
+    .card{
+      background:var(--card-bg);backdrop-filter:blur(25px);
+      border:1px solid var(--border);border-radius:30px;padding:35px;
+      animation:fadeIn .45s ease;
+    }
+    @keyframes fadeIn{
+      from{opacity:0;transform:translateY(15px)}
+      to{opacity:1;transform:translateY(0)}
     }
 
-    .logo img {
-      height: 70px;
-      object-fit: contain;
-      display: block;
-      transition: 0.25s;
+    .choice-btns{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .choice-card{
+      padding:40px 20px;text-align:center;border-radius:25px;cursor:pointer;
+      transition:.35s;border:1px solid var(--border);background:var(--card-bg);
     }
-    .logo img:hover { transform: scale(1.04); }
+    .choice-card:hover{border-color:var(--primary);transform:translateY(-5px)}
 
-    .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-
-    /* ===== Cards ===== */
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(25px);
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      padding: 35px;
-      animation: fadeIn 0.5s ease;
+    input{
+      width:100%;padding:14px;border-radius:12px;border:1px solid var(--border);
+      background:rgba(15,23,42,.6);color:white;margin-bottom:15px;outline:none;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
+    .hidden{display:none}
+    .btn-submit{
+      width:100%;padding:16px;background:var(--primary);border:none;color:white;
+      font-weight:800;border-radius:15px;cursor:pointer;font-size:16px;
     }
 
-    .choice-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .choice-card {
-      padding: 40px 20px;
-      text-align: center;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: 0.4s;
-      border: 1px solid var(--border);
-      background: var(--card-bg);
+    .car-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:20px}
+    .car-item{
+      background:rgba(255,255,255,.03);border:1px solid var(--border);
+      border-radius:20px;padding:20px;transition:.25s;position:relative;
     }
-    .choice-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+    .car-item:hover{background:rgba(255,255,255,.08);border-color:var(--secondary)}
+    .car-price{font-size:20px;font-weight:900;color:var(--secondary)}
+    .car-tag{position:absolute;top:10px;right:10px;font-size:10px;background:var(--primary);padding:4px 8px;border-radius:8px}
 
-    /* ===== Form ===== */
-    input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.6);
-      color: white;
-      margin-bottom: 15px;
-      outline: none;
-    }
-    .hidden { display: none; }
-
-    .btn-submit {
-      width: 100%;
-      padding: 16px;
-      background: var(--primary);
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 15px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    /* ===== Car list ===== */
-    .car-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
-    .car-item {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px;
-      transition: 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-    .car-item:hover { background: rgba(255,255,255,0.08); border-color: var(--secondary); }
-    .car-price { font-size: 20px; font-weight: bold; color: var(--secondary); }
-    .car-tag { position: absolute; top: 10px; right: 10px; font-size: 10px; background: var(--primary); padding: 4px 8px; border-radius: 8px; }
-
-    /* RTL (Arabic etc) */
-    [dir="rtl"] { text-align: right; }
+    /* RTL */
+    [dir="rtl"] .action-btn{ text-align:right; }
   </style>
 </head>
 
 <body>
 
-  <!-- Overlay (Language / Country Code) -->
+  <!-- Overlay -->
   <div id="overlay-screen">
-    <h2 id="overlay-title">Select Language</h2>
+    <div class="overlay-top">
+      <h2 id="overlay-title">Select Language</h2>
+
+      <div class="overlay-search">
+        <input id="overlay-search" type="text" placeholder="Search..." />
+        <button class="action-btn" id="overlay-back-btn" style="display:none;justify-content:center;">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+      </div>
+    </div>
+
     <div class="scroll-grid" id="overlay-content"></div>
   </div>
 
   <header>
     <div class="logo">
-      <!-- logo.png ni index.html bilan bitta papkaga qo‘y -->
-      <img src="logo.png" alt="TEMURrentCar Logo" />
+      <img src="logo.png" alt="TEMURrentCar Logo">
     </div>
     <div>
       <i class="fas fa-user-circle"></i>
@@ -183,7 +148,6 @@
 
   <div class="container">
 
-    <!-- Step Choice -->
     <div id="step-choice" class="choice-btns">
       <div class="choice-card" onclick="showRegistration('give')">
         <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
@@ -198,55 +162,58 @@
       </div>
     </div>
 
-    <!-- Registration Form -->
     <div id="form-register" class="card hidden">
       <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
 
       <input type="text" id="inp-name" placeholder="Full Name">
 
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button onclick="openCountryPicker()" id="country-code" style="flex: 0.35; height: 50px;" class="action-btn">+998</button>
-        <input type="text" id="inp-phone" placeholder="Phone" style="flex: 1; margin-bottom: 0;">
+      <div style="display:flex;gap:10px;margin-bottom:15px;">
+        <button onclick="openCountryPicker()" id="country-code" style="flex:0.35;height:50px;" class="action-btn">
+          <span id="country-flag">🇺🇿</span>
+          <span id="country-dial">+998</span>
+          <span class="badge" style="margin-left:auto;">Pick</span>
+        </button>
+
+        <input type="text" id="inp-phone" placeholder="Phone" style="flex:1;margin-bottom:0;">
       </div>
 
       <div id="extra-fields" class="hidden">
         <input type="text" id="inp-model" placeholder="Car Model">
         <input type="text" id="inp-loc" placeholder="Location">
-        <div style="display: flex; gap: 10px;">
+        <div style="display:flex;gap:10px;">
           <input type="number" id="inp-mon" placeholder="Monthly ($)">
           <input type="number" id="inp-year" placeholder="Yearly ($)">
         </div>
       </div>
 
       <button class="btn-submit" id="btn-next" onclick="handleFormSubmit()">Continue</button>
-      <p onclick="goBack()" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.4;" id="txt-back">← Back</p>
+      <p onclick="goBack()" style="text-align:center;margin-top:15px;cursor:pointer;opacity:.4;" id="txt-back">← Back</p>
     </div>
 
-    <!-- Results -->
     <div id="car-results" class="hidden">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h2 id="txt-title-take">Available Cars</h2>
-        <button onclick="goBack()" class="action-btn" style="padding: 6px 15px;">Back</button>
+        <button onclick="goBack()" class="action-btn" style="padding:6px 15px;justify-content:center;">Back</button>
       </div>
 
       <div class="car-grid">
         <div class="car-item">
           <div class="car-tag">Available</div>
-          <h3 style="margin-bottom: 5px;">Chevrolet Tahoe</h3>
-          <p style="font-size: 12px; opacity: 0.6; margin-bottom: 15px;"><i class="fas fa-map-marker-alt"></i> Tashkent, Uzbekistan</p>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="car-price">$1200 <small style="font-size: 10px; opacity: 0.5;">/mo</small></span>
-            <button class="action-btn" style="background: var(--secondary); border: none;"><i class="fas fa-phone"></i> Contact</button>
+          <h3 style="margin-bottom:5px;">Chevrolet Tahoe</h3>
+          <p style="font-size:12px;opacity:.6;margin-bottom:15px;"><i class="fas fa-map-marker-alt"></i> Tashkent, Uzbekistan</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="car-price">$1200 <small style="font-size:10px;opacity:.5;">/mo</small></span>
+            <button class="action-btn" style="background:var(--secondary);border:none;"><i class="fas fa-phone"></i> Contact</button>
           </div>
         </div>
 
         <div class="car-item">
           <div class="car-tag">Premium</div>
-          <h3 style="margin-bottom: 5px;">Mercedes-Benz G63</h3>
-          <p style="font-size: 12px; opacity: 0.6; margin-bottom: 15px;"><i class="fas fa-map-marker-alt"></i> Dubai, UAE</p>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="car-price">$5500 <small style="font-size: 10px; opacity: 0.5;">/mo</small></span>
-            <button class="action-btn" style="background: var(--secondary); border: none;"><i class="fas fa-phone"></i> Contact</button>
+          <h3 style="margin-bottom:5px;">Mercedes-Benz G63</h3>
+          <p style="font-size:12px;opacity:.6;margin-bottom:15px;"><i class="fas fa-map-marker-alt"></i> Dubai, UAE</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="car-price">$5500 <small style="font-size:10px;opacity:.5;">/mo</small></span>
+            <button class="action-btn" style="background:var(--secondary);border:none;"><i class="fas fa-phone"></i> Contact</button>
           </div>
         </div>
       </div>
@@ -255,7 +222,7 @@
   </div>
 
   <script>
-    /* =================== 50 TA TIL (LIST) =================== */
+    /* ===================== 50 Languages (list) ===================== */
     const langList50 = [
       "O'zbek", "English", "Русский", "Türkçe", "Deutsch", "Français", "Español", "Italiano", "Português",
       "O'zbek (Krill)", "Қазақша", "Кыргызча", "Тоҷикӣ", "Türkmençe", "العربية", "فارسی", "Azərbaycan",
@@ -265,127 +232,70 @@
       "Eesti", "עברית", "বাংলা", "اردو", "മലയാളം", "தமிழ்", "తెలుగు", "ಕನ್ನಡ", "ગુજરાતી", "Filipino"
     ];
 
-    /* =================== TRANSLATIONS (asosiylari bor) ===================
-       Qolgan tillar default Englishga tushadi (tushunarlik/ishlaydi).
-    */
+    /* ===================== Base texts (real translations for main languages) ===================== */
     const translations = {
-      "English": {
-        login: "Login", give: "Rent Out", take: "Rent In",
-        givesub: "Add a car", takesub: "Search car",
-        reg: "Registration", submit: "Continue", back: "← Back",
-        name: "Full Name", phone: "Phone", model: "Car Model", loc: "Location",
-        mon: "Monthly ($)", year: "Yearly ($)", title_take: "Available Cars"
-      },
-      "O'zbek": {
-        login: "Kirish", give: "Ijaraga berish", take: "Ijaraga olish",
-        givesub: "Mashina qo'shish", takesub: "Mashina qidirish",
-        reg: "Ro‘yxatdan o‘tish", submit: "Davom etish", back: "← Orqaga",
-        name: "F.I.Sh", phone: "Telefon", model: "Mashina modeli", loc: "Manzil",
-        mon: "Oylik ($)", year: "Yillik ($)", title_take: "Mavjud mashinalar"
-      },
-      "Русский": {
-        login: "Вход", give: "Сдать", take: "Снять",
-        givesub: "Добавить авто", takesub: "Поиск авто",
-        reg: "Регистрация", submit: "Продолжить", back: "← Назад",
-        name: "ФИО", phone: "Телефон", model: "Модель авто", loc: "Адрес",
-        mon: "В месяц ($)", year: "В год ($)", title_take: "Доступные авто"
-      },
-      "Türkçe": {
-        login: "Giriş", give: "Kiraya Ver", take: "Kirala",
-        givesub: "Araba ekle", takesub: "Araba ara",
-        reg: "Kayıt", submit: "Devam", back: "← Geri",
-        name: "Ad Soyad", phone: "Telefon", model: "Araba Modeli", loc: "Konum",
-        mon: "Aylık ($)", year: "Yıllık ($)", title_take: "Uygun Arabalar"
-      },
-      "Deutsch": {
-        login: "Anmelden", give: "Vermieten", take: "Mieten",
-        givesub: "Auto hinzufügen", takesub: "Auto suchen",
-        reg: "Registrierung", submit: "Weiter", back: "← Zurück",
-        name: "Name", phone: "Telefon", model: "Automodell", loc: "Standort",
-        mon: "Monatlich ($)", year: "Jährlich ($)", title_take: "Verfügbare Autos"
-      },
-      "Français": {
-        login: "Connexion", give: "Louer", take: "Prendre",
-        givesub: "Ajouter une voiture", takesub: "Chercher",
-        reg: "Inscription", submit: "Continuer", back: "← Retour",
-        name: "Nom complet", phone: "Téléphone", model: "Modèle", loc: "Adresse",
-        mon: "Mensuel ($)", year: "Annuel ($)", title_take: "Voitures disponibles"
-      },
-      "العربية": {
-        login: "دخول", give: "تأجير", take: "استئجار",
-        givesub: "إضافة سيارة", takesub: "بحث",
-        reg: "تسجيل", submit: "متابعة", back: "← رجوع",
-        name: "الاسم الكامل", phone: "الهاتف", model: "موديل السيارة", loc: "الموقع",
-        mon: "شهري ($)", year: "سنوي ($)", title_take: "السيارات المتاحة"
-      },
-      "中文": {
-        login: "登录", give: "出租", take: "租车",
-        givesub: "添加车辆", takesub: "搜索",
-        reg: "注册", submit: "继续", back: "← 返回",
-        name: "姓名", phone: "电话", model: "车型", loc: "地点",
-        mon: "每月 ($)", year: "每年 ($)", title_take: "可用车辆"
-      },
-      "日本語": {
-        login: "ログイン", give: "貸し出す", take: "借りる",
-        givesub: "車を追加", takesub: "検索",
-        reg: "登録", submit: "続行", back: "← 戻る",
-        name: "氏名", phone: "電話", model: "車種", loc: "場所",
-        mon: "月額 ($)", year: "年額 ($)", title_take: "利用可能な車"
-      },
-      "한국어": {
-        login: "로그인", give: "대여", take: "렌트",
-        givesub: "차량 추가", takesub: "검색",
-        reg: "등록", submit: "계속", back: "← 뒤로",
-        name: "이름", phone: "전화", model: "차량 모델", loc: "위치",
-        mon: "월간 ($)", year: "연간 ($)", title_take: "이용 가능한 차량"
-      },
-      "Español": {
-        login: "Entrar", give: "Alquilar", take: "Rentar",
-        givesub: "Añadir coche", takesub: "Buscar",
-        reg: "Registro", submit: "Continuar", back: "← Volver",
-        name: "Nombre", phone: "Teléfono", model: "Modelo", loc: "Ubicación",
-        mon: "Mensual ($)", year: "Anual ($)", title_take: "Autos disponibles"
-      },
-      "Italiano": {
-        login: "Accedi", give: "Noleggia", take: "Affitta",
-        givesub: "Aggiungi auto", takesub: "Cerca",
-        reg: "Registrazione", submit: "Continua", back: "← Indietro",
-        name: "Nome", phone: "Telefono", model: "Modello", loc: "Posizione",
-        mon: "Mensile ($)", year: "Annuale ($)", title_take: "Auto disponibili"
-      },
-      "Português": {
-        login: "Entrar", give: "Alugar", take: "Arrendar",
-        givesub: "Adicionar carro", takesub: "Procurar",
-        reg: "Registro", submit: "Continuar", back: "← Voltar",
-        name: "Nome", phone: "Telefone", model: "Modelo", loc: "Localização",
-        mon: "Mensal ($)", year: "Anual ($)", title_take: "Carros disponíveis"
-      },
-      "Қазақша": {
-        login: "Кіру", give: "Жалға беру", take: "Жалға алу",
-        givesub: "Көлік қосу", takesub: "Іздеу",
-        reg: "Тіркелу", submit: "Жалғастыру", back: "← Артқа",
-        name: "Аты-жөні", phone: "Телефон", model: "Модель", loc: "Мекенжай",
-        mon: "Айлық ($)", year: "Жылдық ($)", title_take: "Қолжетімді көліктер"
-      }
+      "English": { login:"Login", give:"Rent Out", take:"Rent In", givesub:"Add a car", takesub:"Search car", reg:"Registration", submit:"Continue", back:"← Back", name:"Full Name", phone:"Phone", model:"Car Model", loc:"Location", mon:"Monthly ($)", year:"Yearly ($)", title_take:"Available Cars", search:"Search..." },
+      "O'zbek": { login:"Kirish", give:"Ijaraga berish", take:"Ijaraga olish", givesub:"Mashina qo'shish", takesub:"Mashina qidirish", reg:"Ro‘yxatdan o‘tish", submit:"Davom etish", back:"← Orqaga", name:"F.I.Sh", phone:"Telefon", model:"Mashina modeli", loc:"Manzil", mon:"Oylik ($)", year:"Yillik ($)", title_take:"Mavjud mashinalar", search:"Qidirish..." },
+      "Русский": { login:"Вход", give:"Сдать", take:"Снять", givesub:"Добавить авто", takesub:"Поиск авто", reg:"Регистрация", submit:"Продолжить", back:"← Назад", name:"ФИО", phone:"Телефон", model:"Модель авто", loc:"Адрес", mon:"В месяц ($)", year:"В год ($)", title_take:"Доступные авто", search:"Поиск..." },
+      "Türkçe": { login:"Giriş", give:"Kiraya Ver", take:"Kirala", givesub:"Araba ekle", takesub:"Ara", reg:"Kayıt", submit:"Devam", back:"← Geri", name:"Ad Soyad", phone:"Telefon", model:"Araba Modeli", loc:"Konum", mon:"Aylık ($)", year:"Yıllık ($)", title_take:"Uygun Arabalar", search:"Ara..." },
+      "Deutsch": { login:"Anmelden", give:"Vermieten", take:"Mieten", givesub:"Auto hinzufügen", takesub:"Suchen", reg:"Registrierung", submit:"Weiter", back:"← Zurück", name:"Name", phone:"Telefon", model:"Automodell", loc:"Standort", mon:"Monatlich ($)", year:"Jährlich ($)", title_take:"Verfügbare Autos", search:"Suchen..." },
+      "Français": { login:"Connexion", give:"Louer", take:"Prendre", givesub:"Ajouter", takesub:"Chercher", reg:"Inscription", submit:"Continuer", back:"← Retour", name:"Nom complet", phone:"Téléphone", model:"Modèle", loc:"Adresse", mon:"Mensuel ($)", year:"Annuel ($)", title_take:"Voitures disponibles", search:"Rechercher..." },
+      "العربية": { login:"دخول", give:"تأجير", take:"استئجار", givesub:"إضافة سيارة", takesub:"بحث", reg:"تسجيل", submit:"متابعة", back:"← رجوع", name:"الاسم الكامل", phone:"الهاتف", model:"موديل السيارة", loc:"الموقع", mon:"شهري ($)", year:"سنوي ($)", title_take:"السيارات المتاحة", search:"بحث..." },
+      "中文": { login:"登录", give:"出租", take:"租车", givesub:"添加车辆", takesub:"搜索", reg:"注册", submit:"继续", back:"← 返回", name:"姓名", phone:"电话", model:"车型", loc:"地点", mon:"每月 ($)", year:"每年 ($)", title_take:"可用车辆", search:"搜索..." },
+      "日本語": { login:"ログイン", give:"貸し出す", take:"借りる", givesub:"車を追加", takesub:"検索", reg:"登録", submit:"続行", back:"← 戻る", name:"氏名", phone:"電話", model:"車種", loc:"場所", mon:"月額 ($)", year:"年額 ($)", title_take:"利用可能な車", search:"検索..." },
+      "한국어": { login:"로그인", give:"대여", take:"렌트", givesub:"차량 추가", takesub:"검색", reg:"등록", submit:"계속", back:"← 뒤로", name:"이름", phone:"전화", model:"차량 모델", loc:"위치", mon:"월간 ($)", year:"연간 ($)", title_take:"이용 가능한 차량", search:"검색..." },
+      "Español": { login:"Entrar", give:"Alquilar", take:"Rentar", givesub:"Añadir coche", takesub:"Buscar", reg:"Registro", submit:"Continuar", back:"← Volver", name:"Nombre", phone:"Teléfono", model:"Modelo", loc:"Ubicación", mon:"Mensual ($)", year:"Anual ($)", title_take:"Autos disponibles", search:"Buscar..." },
+      "Italiano": { login:"Accedi", give:"Noleggia", take:"Affitta", givesub:"Aggiungi", takesub:"Cerca", reg:"Registrazione", submit:"Continua", back:"← Indietro", name:"Nome", phone:"Telefono", model:"Modello", loc:"Posizione", mon:"Mensile ($)", year:"Annuale ($)", title_take:"Auto disponibili", search:"Cerca..." },
+      "Português": { login:"Entrar", give:"Alugar", take:"Arrendar", givesub:"Adicionar", takesub:"Procurar", reg:"Registro", submit:"Continuar", back:"← Voltar", name:"Nome", phone:"Telefone", model:"Modelo", loc:"Localização", mon:"Mensal ($)", year:"Anual ($)", title_take:"Carros disponíveis", search:"Pesquisar..." }
     };
 
+    /* Qolgan tillar ham “mavjud” bo‘lishi uchun: agar tarjima yo‘q bo‘lsa English ishlaydi */
+    langList50.forEach(l => { if(!translations[l]) translations[l] = translations["English"]; });
+
+    /* ===================== Countries (with flag + dial code) ===================== */
     const countries = [
-      { n: "Uzbekistan", c: "+998" }, { n: "USA", c: "+1" }, { n: "Russia", c: "+7" },
-      { n: "Turkey", c: "+90" }, { n: "Germany", c: "+49" }, { n: "UK", c: "+44" },
-      { n: "UAE", c: "+971" }, { n: "Kazakhstan", c: "+7" }, { n: "Kyrgyzstan", c: "+996" },
-      { n: "Tajikistan", c: "+992" }, { n: "South Korea", c: "+82" }, { n: "Poland", c: "+48" },
-      { n: "France", c: "+33" }, { n: "Italy", c: "+39" }, { n: "Egypt", c: "+20" },
-      { n: "India", c: "+91" }, { n: "Japan", c: "+81" }, { n: "China", c: "+86" }
+      { n:"Uzbekistan", flag:"🇺🇿", c:"+998" },
+      { n:"USA", flag:"🇺🇸", c:"+1" },
+      { n:"Russia", flag:"🇷🇺", c:"+7" },
+      { n:"Turkey", flag:"🇹🇷", c:"+90" },
+      { n:"Germany", flag:"🇩🇪", c:"+49" },
+      { n:"United Kingdom", flag:"🇬🇧", c:"+44" },
+      { n:"UAE", flag:"🇦🇪", c:"+971" },
+      { n:"Kazakhstan", flag:"🇰🇿", c:"+7" },
+      { n:"Kyrgyzstan", flag:"🇰🇬", c:"+996" },
+      { n:"Tajikistan", flag:"🇹🇯", c:"+992" },
+      { n:"South Korea", flag:"🇰🇷", c:"+82" },
+      { n:"Poland", flag:"🇵🇱", c:"+48" },
+      { n:"France", flag:"🇫🇷", c:"+33" },
+      { n:"Italy", flag:"🇮🇹", c:"+39" },
+      { n:"Egypt", flag:"🇪🇬", c:"+20" },
+      { n:"India", flag:"🇮🇳", c:"+91" },
+      { n:"Japan", flag:"🇯🇵", c:"+81" },
+      { n:"China", flag:"🇨🇳", c:"+86" }
     ];
 
-    let currentMode = "";
+    /* ===================== Overlay controller ===================== */
     let overlayMode = "language"; // "language" | "country"
+    let currentMode = "";
 
     const overlay = document.getElementById("overlay-screen");
     const overlayTitle = document.getElementById("overlay-title");
     const overlayContent = document.getElementById("overlay-content");
+    const overlaySearch = document.getElementById("overlay-search");
+    const overlayBackBtn = document.getElementById("overlay-back-btn");
 
-    function applyText(t) {
+    function clearOverlay(){
+      overlayContent.innerHTML = "";
+      overlaySearch.value = "";
+    }
+
+    function setDirIfNeeded(lang){
+      document.body.dir = (lang === "العربية") ? "rtl" : "ltr";
+    }
+
+    function applyText(lang){
+      const t = translations[lang] || translations["English"];
+
       document.getElementById("txt-login").innerText = t.login;
       document.getElementById("txt-give").innerText = t.give;
       document.getElementById("txt-take").innerText = t.take;
@@ -398,8 +308,6 @@
 
       document.getElementById("inp-name").placeholder = t.name;
       document.getElementById("inp-phone").placeholder = t.phone;
-
-      // extra fields
       document.getElementById("inp-model").placeholder = t.model;
       document.getElementById("inp-loc").placeholder = t.loc;
       document.getElementById("inp-mon").placeholder = t.mon;
@@ -407,26 +315,26 @@
 
       document.getElementById("txt-title-take").innerText = t.title_take;
 
-      // RTL support
-      document.body.dir = (t === translations["العربية"]) ? "rtl" : "ltr";
+      overlaySearch.placeholder = t.search || "Search...";
+      setDirIfNeeded(lang);
     }
 
-    function setLang(lang) {
-      const t = translations[lang] || translations["English"];
+    function setLang(lang){
       localStorage.setItem("lang", lang);
-      applyText(t);
+      applyText(lang);
       overlay.style.display = "none";
     }
 
-    function buildLanguageOverlay() {
+    function buildLanguageOverlay(){
       overlayMode = "language";
+      clearOverlay();
       overlayTitle.innerText = "Select Language";
-      overlayContent.innerHTML = "";
+      overlayBackBtn.style.display = "none";
 
       langList50.forEach(l => {
         const btn = document.createElement("button");
         btn.className = "action-btn";
-        btn.innerText = l;
+        btn.innerHTML = `<i class="fa-solid fa-language"></i> <span>${l}</span>`;
         btn.onclick = () => setLang(l);
         overlayContent.appendChild(btn);
       });
@@ -434,39 +342,77 @@
       overlay.style.display = "flex";
     }
 
-    function openCountryPicker() {
+    function buildCountryOverlay(){
       overlayMode = "country";
+      clearOverlay();
       overlayTitle.innerText = "Select Country Code";
-      overlayContent.innerHTML = "";
+      overlayBackBtn.style.display = "flex";
+      overlayBackBtn.onclick = () => {
+        // country overlaydan chiqib ketish (formga qaytish)
+        overlay.style.display = "none";
+      };
 
-      countries.forEach(item => {
+      renderCountries(countries);
+      overlay.style.display = "flex";
+    }
+
+    function renderCountries(list){
+      overlayContent.innerHTML = "";
+      list.forEach(item => {
         const btn = document.createElement("button");
         btn.className = "action-btn";
-        btn.innerText = `${item.n} (${item.c})`;
+        btn.innerHTML = `<span style="font-size:18px">${item.flag}</span><span>${item.n}</span><span class="badge">${item.c}</span>`;
         btn.onclick = () => {
-          document.getElementById("country-code").innerText = item.c;
+          document.getElementById("country-flag").innerText = item.flag;
+          document.getElementById("country-dial").innerText = item.c;
           overlay.style.display = "none";
         };
         overlayContent.appendChild(btn);
       });
-
-      overlay.style.display = "flex";
     }
 
-    function showRegistration(mode) {
+    overlaySearch.addEventListener("input", () => {
+      const q = overlaySearch.value.trim().toLowerCase();
+
+      if(overlayMode === "language"){
+        // language filter
+        const filtered = langList50.filter(x => x.toLowerCase().includes(q));
+        overlayContent.innerHTML = "";
+        filtered.forEach(l => {
+          const btn = document.createElement("button");
+          btn.className = "action-btn";
+          btn.innerHTML = `<i class="fa-solid fa-language"></i> <span>${l}</span>`;
+          btn.onclick = () => setLang(l);
+          overlayContent.appendChild(btn);
+        });
+      } else {
+        // country filter
+        const filtered = countries.filter(x =>
+          x.n.toLowerCase().includes(q) || x.c.toLowerCase().includes(q)
+        );
+        renderCountries(filtered);
+      }
+    });
+
+    /* ===================== Page actions ===================== */
+    function openCountryPicker(){
+      buildCountryOverlay();
+    }
+
+    function showRegistration(mode){
       currentMode = mode;
       document.getElementById("step-choice").classList.add("hidden");
       document.getElementById("form-register").classList.remove("hidden");
 
-      if (mode === "give") {
+      if(mode === "give"){
         document.getElementById("extra-fields").classList.remove("hidden");
       } else {
         document.getElementById("extra-fields").classList.add("hidden");
       }
     }
 
-    function handleFormSubmit() {
-      if (currentMode === "take") {
+    function handleFormSubmit(){
+      if(currentMode === "take"){
         document.getElementById("form-register").classList.add("hidden");
         document.getElementById("car-results").classList.remove("hidden");
       } else {
@@ -475,26 +421,26 @@
       }
     }
 
-    function goBack() {
+    function goBack(){
       document.getElementById("step-choice").classList.remove("hidden");
       document.getElementById("form-register").classList.add("hidden");
       document.getElementById("car-results").classList.add("hidden");
     }
 
-    // phone only numbers
+    // phone only digits
     document.getElementById("inp-phone").addEventListener("input", (e) => {
       e.target.value = e.target.value.replace(/[^0-9]/g, "");
     });
 
-    // Start: open language overlay
+    /* ===================== Start ===================== */
     buildLanguageOverlay();
 
-    // auto apply saved language if exist
-    const saved = localStorage.getItem("lang");
-    if (saved) {
-      setLang(saved);
+    // auto apply saved language
+    const savedLang = localStorage.getItem("lang");
+    if(savedLang){
+      applyText(savedLang);
+      overlay.style.display = "none";
     }
   </script>
-
 </body>
 </html>
