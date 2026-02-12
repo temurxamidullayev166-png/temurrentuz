@@ -1,17 +1,18 @@
-import { defineConfig } from 'astro/config';
-import netlify from '@astrojs/netlify';
-import react from '@astrojs/react';
-import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
+import tailwindcss from "@tailwindcss/vite";
 
-// https://astro.build/config
+// GitHub Pages config
 export default defineConfig({
-    vite: {
-        plugins: [tailwindcss()]
-    },
-    integrations: [react()],
-    adapter: netlify({
-        devFeatures: {
-            environmentVariables: true
-        }
-    })
+  output: "static",
+  vite: {
+    plugins: [tailwindcss()],
+  },
+  integrations: [react()],
+
+  // SHU YERNI O'ZINGGA MOSLAB YOZASAN:
+  // 1) USERNAME -> GitHub username
+  // 2) REPO -> repo nomi
+  site: "https://USERNAME.github.io",
+  base: "/REPO",
 });
