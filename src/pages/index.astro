@@ -2,662 +2,644 @@
 /* Astro frontmatter bo‘sh */
 ---
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+  :root{
+    --primary:#3b82f6;
+    --secondary:#10b981;
+    --dark:#070b14;
+    --card-bg:rgba(255,255,255,0.06);
+    --border:rgba(255,255,255,0.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif}
+  body{
+    background:radial-gradient(circle at top right,#1e293b,#070b14);
+    color:#f8fafc;min-height:100vh;overflow-x:hidden;
+  }
 
-  <style>
-    :root{
-      --primary:#3b82f6;
-      --secondary:#10b981;
-      --dark:#070b14;
-      --card-bg:rgba(255,255,255,0.06);
-      --border:rgba(255,255,255,0.1);
-    }
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif}
-    body{
-      background:radial-gradient(circle at top right,#1e293b,#070b14);
-      color:#f8fafc;min-height:100vh;overflow-x:hidden;
-    }
+  /* ===== Overlay System ===== */
+  #overlay-screen{
+    position:fixed;inset:0;background:var(--dark);z-index:1000;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    transition:.5s ease;padding:20px;
+  }
+  .overlay-top{
+    width:min(1100px,95%);
+    display:flex;gap:12px;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;
+  }
+  #overlay-title{font-size:20px;font-weight:900;letter-spacing:-.5px}
+  .overlay-search{
+    width:min(520px,100%);
+    display:flex;gap:10px;align-items:center;
+  }
+  .overlay-search input{
+    width:100%;
+    padding:12px 14px;border-radius:12px;border:1px solid var(--border);
+    background:rgba(15,23,42,.6);color:white;outline:none;
+  }
+  .scroll-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:12px;max-width:1100px;width:95%;margin-top:18px;
+    max-height:72vh;overflow-y:auto;padding:10px;
+  }
+  .action-btn{
+    padding:12px;background:var(--card-bg);border:1px solid var(--border);
+    color:white;border-radius:12px;cursor:pointer;transition:.25s;
+    font-size:14px;text-align:left;display:flex;gap:10px;align-items:center;
+    user-select:none;
+  }
+  .action-btn:hover{background:var(--primary);transform:translateY(-3px)}
+  .badge{
+    margin-left:auto;
+    font-size:12px;opacity:.9;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    padding:2px 8px;border-radius:999px;
+  }
+  .section-label{
+    grid-column:1/-1;
+    opacity:.7;font-size:12px;font-weight:800;
+    letter-spacing:.6px;text-transform:uppercase;
+    margin-top:6px;
+  }
 
-    /* ===== Overlay System ===== */
-    #overlay-screen{
-      position:fixed;inset:0;background:var(--dark);z-index:1000;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      transition:.5s ease;padding:20px;
-    }
-    .overlay-top{
-      width:min(1100px,95%);
-      display:flex;gap:12px;align-items:center;justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    #overlay-title{font-size:20px;font-weight:900;letter-spacing:-.5px}
-    .overlay-search{
-      width:min(520px,100%);
-      display:flex;gap:10px;align-items:center;
-    }
-    .overlay-search input{
-      width:100%;
-      padding:12px 14px;border-radius:12px;border:1px solid var(--border);
-      background:rgba(15,23,42,.6);color:white;outline:none;
-    }
-    .scroll-grid{
-      display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-      gap:12px;max-width:1100px;width:95%;margin-top:18px;
-      max-height:72vh;overflow-y:auto;padding:10px;
-    }
-    .action-btn{
-      padding:12px;background:var(--card-bg);border:1px solid var(--border);
-      color:white;border-radius:12px;cursor:pointer;transition:.25s;
-      font-size:14px;text-align:left;display:flex;gap:10px;align-items:center;
-      user-select:none;
-    }
-    .action-btn:hover{background:var(--primary);transform:translateY(-3px)}
-    .badge{
-      margin-left:auto;
-      font-size:12px;opacity:.9;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.12);
-      padding:2px 8px;border-radius:999px;
-    }
-    .section-label{
-      grid-column:1/-1;
-      opacity:.7;font-size:12px;font-weight:800;
-      letter-spacing:.6px;text-transform:uppercase;
-      margin-top:6px;
-    }
+  /* ===== Header ===== */
+  header{
+    padding:16px 5%;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(7,11,20,.8);backdrop-filter:blur(15px);
+    border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+  }
+  .logo img{height:70px;object-fit:contain;display:block;transition:.2s}
+  .logo img:hover{transform:scale(1.04)}
 
-    /* ===== Header ===== */
-    header{
-      padding:16px 5%;display:flex;justify-content:space-between;align-items:center;
-      background:rgba(7,11,20,.8);backdrop-filter:blur(15px);
-      border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
-    }
-    .logo img{height:70px;object-fit:contain;display:block;transition:.2s}
-    .logo img:hover{transform:scale(1.04)}
+  .container{max-width:1100px;margin:40px auto;padding:0 20px}
+  .card{
+    background:var(--card-bg);backdrop-filter:blur(25px);
+    border:1px solid var(--border);border-radius:30px;padding:35px;
+    animation:fadeIn .45s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(15px)}
+    to{opacity:1;transform:translateY(0)}
+  }
 
-    .container{max-width:1100px;margin:40px auto;padding:0 20px}
-    .card{
-      background:var(--card-bg);backdrop-filter:blur(25px);
-      border:1px solid var(--border);border-radius:30px;padding:35px;
-      animation:fadeIn .45s ease;
-    }
-    @keyframes fadeIn{
-      from{opacity:0;transform:translateY(15px)}
-      to{opacity:1;transform:translateY(0)}
-    }
+  .choice-btns{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .choice-card{
+    padding:40px 20px;text-align:center;border-radius:25px;cursor:pointer;
+    transition:.35s;border:1px solid var(--border);background:var(--card-bg);
+  }
+  .choice-card:hover{border-color:var(--primary);transform:translateY(-5px)}
 
-    .choice-btns{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    .choice-card{
-      padding:40px 20px;text-align:center;border-radius:25px;cursor:pointer;
-      transition:.35s;border:1px solid var(--border);background:var(--card-bg);
-    }
-    .choice-card:hover{border-color:var(--primary);transform:translateY(-5px)}
+  input{
+    width:100%;padding:14px;border-radius:12px;border:1px solid var(--border);
+    background:rgba(15,23,42,.6);color:white;margin-bottom:15px;outline:none;
+  }
+  .hidden{display:none}
+  .btn-submit{
+    width:100%;padding:16px;background:var(--primary);border:none;color:white;
+    font-weight:900;border-radius:15px;cursor:pointer;font-size:16px;
+  }
 
-    input{
-      width:100%;padding:14px;border-radius:12px;border:1px solid var(--border);
-      background:rgba(15,23,42,.6);color:white;margin-bottom:15px;outline:none;
-    }
-    .hidden{display:none}
-    .btn-submit{
-      width:100%;padding:16px;background:var(--primary);border:none;color:white;
-      font-weight:900;border-radius:15px;cursor:pointer;font-size:16px;
-    }
+  /* ===== Results + filters ===== */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .filters{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px;
+  }
+  .filters .mini{
+    background:rgba(15,23,42,.35);
+    border:1px solid var(--border);
+    padding:12px;border-radius:16px;
+  }
+  .filters label{display:flex;justify-content:space-between;gap:10px;font-size:12px;opacity:.75;margin-bottom:8px}
+  .filters input[type="range"]{margin:8px 0 0 0}
+  .filters input{margin:0}
+  @media(max-width:900px){
+    .filters{grid-template-columns:1fr}
+  }
 
-    /* ===== Results + filters ===== */
-    .topbar{
-      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-    .filters{
-      display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px;
-    }
-    .filters .mini{
-      background:rgba(15,23,42,.35);
-      border:1px solid var(--border);
-      padding:12px;border-radius:16px;
-    }
-    .filters label{display:flex;justify-content:space-between;gap:10px;font-size:12px;opacity:.75;margin-bottom:8px}
-    .filters input[type="range"]{margin:8px 0 0 0}
-    .filters input{margin:0}
-    @media(max-width:900px){
-      .filters{grid-template-columns:1fr}
-    }
+  .car-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:18px;margin-top:14px;
+  }
+  .car-item{
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:20px;padding:18px;transition:.25s;position:relative;
+    overflow:hidden;
+  }
+  .car-item:hover{background:rgba(255,255,255,.08);border-color:var(--secondary)}
+  .car-tag{
+    position:absolute;top:12px;right:12px;font-size:10px;
+    background:var(--primary);padding:4px 8px;border-radius:999px;
+    letter-spacing:.4px;
+  }
+  .car-price{font-size:20px;font-weight:950;color:var(--secondary)}
+  .muted{opacity:.6;font-size:12px}
+  .row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px
+  }
+  .pill{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    padding:6px 10px;border-radius:999px;font-size:12px;opacity:.9
+  }
 
-    .car-grid{
-      display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-      gap:18px;margin-top:14px;
-    }
-    .car-item{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:20px;padding:18px;transition:.25s;position:relative;
-      overflow:hidden;
-    }
-    .car-item:hover{background:rgba(255,255,255,.08);border-color:var(--secondary)}
-    .car-tag{
-      position:absolute;top:12px;right:12px;font-size:10px;
-      background:var(--primary);padding:4px 8px;border-radius:999px;
-      letter-spacing:.4px;
-    }
-    .car-price{font-size:20px;font-weight:950;color:var(--secondary)}
-    .muted{opacity:.6;font-size:12px}
-    .row{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px
-    }
-    .pill{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      padding:6px 10px;border-radius:999px;font-size:12px;opacity:.9
-    }
+  /* RTL */
+  [dir="rtl"] .action-btn{ text-align:right; }
+  [dir="rtl"] .car-tag{ left:12px; right:auto; }
+</style>
 
-    /* RTL */
-    [dir="rtl"] .action-btn{ text-align:right; }
-    [dir="rtl"] .car-tag{ left:12px; right:auto; }
-  </style>
-</head>
+<!-- Overlay -->
+<div id="overlay-screen">
+  <div class="overlay-top">
+    <h2 id="overlay-title">Select Language</h2>
 
-<body>
+    <div class="overlay-search">
+      <input id="overlay-search" type="text" placeholder="Search..." />
+      <button class="action-btn" id="overlay-back-btn" style="display:none;justify-content:center;">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
 
-  <!-- Overlay -->
-  <div id="overlay-screen">
-    <div class="overlay-top">
-      <h2 id="overlay-title">Select Language</h2>
+  <div class="scroll-grid" id="overlay-content"></div>
+</div>
 
-      <div class="overlay-search">
-        <input id="overlay-search" type="text" placeholder="Search..." />
-        <button class="action-btn" id="overlay-back-btn" style="display:none;justify-content:center;">
-          <i class="fa-solid fa-arrow-left"></i>
+<header>
+  <div class="logo">
+    <!-- logo.png ni public/logo.png qilib qo'y -->
+    <img src="/logo.png" alt="TEMURrentCar Logo">
+  </div>
+  <div>
+    <i class="fas fa-user-circle"></i>
+    <span id="txt-login">Login</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div id="step-choice" class="choice-btns">
+    <div class="choice-card" onclick="showRegistration('give')">
+      <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
+      <h3 id="txt-give">Rent Out</h3>
+      <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
+    </div>
+
+    <div class="choice-card" onclick="showRegistration('take')">
+      <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
+      <h3 id="txt-take">Rent In</h3>
+      <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
+    </div>
+  </div>
+
+  <!-- Register / post -->
+  <div id="form-register" class="card hidden">
+    <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
+
+    <input type="text" id="inp-name" placeholder="Full Name">
+
+    <div style="display:flex;gap:10px;margin-bottom:15px;">
+      <button onclick="openCountryPicker()" id="country-code" style="flex:0.35;height:50px;" class="action-btn">
+        <span id="country-flag">🇺🇿</span>
+        <span id="country-dial">+998</span>
+        <span class="badge" style="margin-left:auto;">Pick</span>
+      </button>
+
+      <input type="text" id="inp-phone" placeholder="Phone" style="flex:1;margin-bottom:0;">
+    </div>
+
+    <div id="extra-fields" class="hidden">
+      <input type="text" id="inp-model" placeholder="Car Model">
+      <input type="text" id="inp-loc" placeholder="Location">
+      <div style="display:flex;gap:10px;">
+        <input type="number" id="inp-mon" placeholder="Monthly ($)">
+        <input type="number" id="inp-year" placeholder="Yearly ($)">
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btn-next" onclick="handleFormSubmit()">Continue</button>
+    <p onclick="goBack()" style="text-align:center;margin-top:15px;cursor:pointer;opacity:.4;" id="txt-back">← Back</p>
+  </div>
+
+  <!-- Results -->
+  <div id="car-results" class="card hidden">
+    <div class="topbar">
+      <h2 id="txt-title-take" style="margin:0;">Available Cars</h2>
+
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="action-btn" onclick="resetDemoData()" title="Reset demo/local data">
+          <i class="fa-solid fa-rotate"></i> Reset
+        </button>
+        <button class="action-btn" onclick="goBack()">
+          <i class="fa-solid fa-arrow-left"></i> <span id="btn-back-top">Back</span>
         </button>
       </div>
     </div>
 
-    <div class="scroll-grid" id="overlay-content"></div>
+    <div class="filters">
+      <div class="mini">
+        <label><span id="lbl-model-filter">Model</span><span class="pill" id="model-count">0</span></label>
+        <input id="filter-model" type="text" placeholder="Search model...">
+      </div>
+
+      <div class="mini">
+        <label><span id="lbl-city-filter">City</span><span class="pill" id="city-count">0</span></label>
+        <input id="filter-city" type="text" placeholder="Search city...">
+      </div>
+
+      <div class="mini">
+        <label><span id="lbl-price-filter">Max Price</span><span class="pill" id="price-val">$2500</span></label>
+        <input id="filter-price" type="range" min="100" max="10000" value="2500">
+      </div>
+    </div>
+
+    <div class="car-grid" id="car-grid"></div>
+
+    <p id="empty-msg" style="opacity:.6;text-align:center;margin-top:18px;display:none;">
+      No cars found for these filters.
+    </p>
   </div>
 
-  <header>
-    <div class="logo">
-      <img src="logo.png" alt="TEMURrentCar Logo">
-    </div>
-    <div>
-      <i class="fas fa-user-circle"></i>
-      <span id="txt-login">Login</span>
-    </div>
-  </header>
+</div>
 
-  <div class="container">
+<script is:inline>
+  /* ===================== 50 Languages ===================== */
+  const langList50 = [
+    "O'zbek", "English", "Русский", "Türkçe", "Deutsch", "Français", "Español", "Italiano", "Português",
+    "O'zbek (Krill)", "Қазақша", "Кыргызcha", "Тоҷикӣ", "Türkmençe", "العربية", "فارسی", "Azərbaycan",
+    "Polski", "Nederlands", "한국어", "日本語", "中文", "हिन्दी", "Tiếng Việt", "ไทย",
+    "Svenska", "Norsk", "Dansk", "Suomi", "Ελληνικά", "Magyar", "Čeština", "Română",
+    "Български", "Українська", "Hrvatski", "Srpski", "Slovenčina", "Lietuvių", "Latviešu",
+    "Eesti", "עברית", "বাংলা", "اردو", "മലയാളം", "தமிழ்", "తెలుగు", "ಕನ್ನಡ", "ગુજરાતી", "Filipino"
+  ];
 
-    <div id="step-choice" class="choice-btns">
-      <div class="choice-card" onclick="showRegistration('give')">
-        <i class="fas fa-key fa-3x" style="color: var(--primary); margin-bottom: 15px;"></i>
-        <h3 id="txt-give">Rent Out</h3>
-        <p id="txt-givesub" style="font-size: 13px; opacity: 0.5;">Add a car</p>
-      </div>
+  /* Asosiy tarjimalar (qolgani Englishga tushadi) */
+  const translations = {
+    "English": { login:"Login", give:"Rent Out", take:"Rent In", givesub:"Add a car", takesub:"Search car", reg:"Registration", submit:"Continue", back:"← Back", name:"Full Name", phone:"Phone", model:"Car Model", loc:"Location", mon:"Monthly ($)", year:"Yearly ($)", title_take:"Available Cars", search:"Search...", backTop:"Back", modelF:"Model", cityF:"City", priceF:"Max Price" },
+    "O'zbek": { login:"Kirish", give:"Ijaraga berish", take:"Ijaraga olish", givesub:"Mashina qo'shish", takesub:"Mashina qidirish", reg:"Ro‘yxatdan o‘tish", submit:"Davom etish", back:"← Orqaga", name:"F.I.Sh", phone:"Telefon", model:"Mashina modeli", loc:"Manzil (Shahar)", mon:"Oylik ($)", year:"Yillik ($)", title_take:"Mavjud mashinalar", search:"Qidirish...", backTop:"Orqaga", modelF:"Model", cityF:"Shahar", priceF:"Maks narx" },
+    "Русский": { login:"Вход", give:"Сдать", take:"Снять", givesub:"Добавить авто", takesub:"Поиск авто", reg:"Регистрация", submit:"Продолжить", back:"← Назад", name:"ФИО", phone:"Телефон", model:"Модель авто", loc:"Город", mon:"В месяц ($)", year:"В год ($)", title_take:"Доступные авто", search:"Поиск...", backTop:"Назад", modelF:"Модель", cityF:"Город", priceF:"Макс. цена" },
+    "العربية": { login:"دخول", give:"تأجير", take:"استئجار", givesub:"إضافة سيارة", takesub:"بحث", reg:"تسجيل", submit:"متابعة", back:"← رجوع", name:"الاسم الكامل", phone:"الهاتف", model:"موديل السيارة", loc:"المدينة", mon:"شهري ($)", year:"سنوي ($)", title_take:"السيارات المتاحة", search:"بحث...", backTop:"رجوع", modelF:"الموديل", cityF:"المدينة", priceF:"أقصى سعر" }
+  };
+  langList50.forEach(l => { if(!translations[l]) translations[l] = translations["English"]; });
 
-      <div class="choice-card" onclick="showRegistration('take')">
-        <i class="fas fa-search fa-3x" style="color: var(--secondary); margin-bottom: 15px;"></i>
-        <h3 id="txt-take">Rent In</h3>
-        <p id="txt-takesub" style="font-size: 13px; opacity: 0.5;">Search car</p>
-      </div>
-    </div>
+  /* ===================== Countries ===================== */
+  const countries = [
+    { n:"Uzbekistan", flag:"🇺🇿", c:"+998" },
+    { n:"USA", flag:"🇺🇸", c:"+1" },
+    { n:"Russia", flag:"🇷🇺", c:"+7" },
+    { n:"Turkey", flag:"🇹🇷", c:"+90" },
+    { n:"Germany", flag:"🇩🇪", c:"+49" },
+    { n:"United Kingdom", flag:"🇬🇧", c:"+44" },
+    { n:"UAE", flag:"🇦🇪", c:"+971" },
+    { n:"Kazakhstan", flag:"🇰🇿", c:"+7" },
+    { n:"Kyrgyzstan", flag:"🇰🇬", c:"+996" },
+    { n:"Tajikistan", flag:"🇹🇯", c:"+992" },
+    { n:"South Korea", flag:"🇰🇷", c:"+82" },
+    { n:"Poland", flag:"🇵🇱", c:"+48" },
+    { n:"France", flag:"🇫🇷", c:"+33" },
+    { n:"Italy", flag:"🇮🇹", c:"+39" },
+    { n:"Egypt", flag:"🇪🇬", c:"+20" },
+    { n:"India", flag:"🇮🇳", c:"+91" },
+    { n:"Japan", flag:"🇯🇵", c:"+81" },
+    { n:"China", flag:"🇨🇳", c:"+86" }
+  ];
+  const popularCountryCodes = ["+998","+7","+1","+90","+971","+44","+49"];
 
-    <!-- Register / post -->
-    <div id="form-register" class="card hidden">
-      <h2 id="reg-title" style="margin-bottom: 25px; text-align: center;">Registration</h2>
+  /* ===================== Overlay controller ===================== */
+  let overlayMode = "language"; // "language" | "country"
+  let currentMode = "";
 
-      <input type="text" id="inp-name" placeholder="Full Name">
+  const overlay = document.getElementById("overlay-screen");
+  const overlayTitle = document.getElementById("overlay-title");
+  const overlayContent = document.getElementById("overlay-content");
+  const overlaySearch = document.getElementById("overlay-search");
+  const overlayBackBtn = document.getElementById("overlay-back-btn");
 
-      <div style="display:flex;gap:10px;margin-bottom:15px;">
-        <button onclick="openCountryPicker()" id="country-code" style="flex:0.35;height:50px;" class="action-btn">
-          <span id="country-flag">🇺🇿</span>
-          <span id="country-dial">+998</span>
-          <span class="badge" style="margin-left:auto;">Pick</span>
-        </button>
+  function clearOverlay(){
+    overlayContent.innerHTML = "";
+    overlaySearch.value = "";
+  }
 
-        <input type="text" id="inp-phone" placeholder="Phone" style="flex:1;margin-bottom:0;">
-      </div>
+  function setDirIfNeeded(lang){
+    document.body.dir = (lang === "العربية") ? "rtl" : "ltr";
+  }
 
-      <div id="extra-fields" class="hidden">
-        <input type="text" id="inp-model" placeholder="Car Model">
-        <input type="text" id="inp-loc" placeholder="Location">
-        <div style="display:flex;gap:10px;">
-          <input type="number" id="inp-mon" placeholder="Monthly ($)">
-          <input type="number" id="inp-year" placeholder="Yearly ($)">
-        </div>
-      </div>
+  function applyText(lang){
+    const t = translations[lang] || translations["English"];
 
-      <button class="btn-submit" id="btn-next" onclick="handleFormSubmit()">Continue</button>
-      <p onclick="goBack()" style="text-align:center;margin-top:15px;cursor:pointer;opacity:.4;" id="txt-back">← Back</p>
-    </div>
+    document.getElementById("txt-login").innerText = t.login;
+    document.getElementById("txt-give").innerText = t.give;
+    document.getElementById("txt-take").innerText = t.take;
+    document.getElementById("txt-givesub").innerText = t.givesub;
+    document.getElementById("txt-takesub").innerText = t.takesub;
 
-    <!-- Results -->
-    <div id="car-results" class="card hidden">
-      <div class="topbar">
-        <h2 id="txt-title-take" style="margin:0;">Available Cars</h2>
+    document.getElementById("reg-title").innerText = t.reg;
+    document.getElementById("btn-next").innerText = t.submit;
+    document.getElementById("txt-back").innerText = t.back;
 
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <button class="action-btn" onclick="resetDemoData()" title="Reset demo/local data">
-            <i class="fa-solid fa-rotate"></i> Reset
-          </button>
-          <button class="action-btn" onclick="goBack()">
-            <i class="fa-solid fa-arrow-left"></i> <span id="btn-back-top">Back</span>
-          </button>
-        </div>
-      </div>
+    document.getElementById("inp-name").placeholder = t.name;
+    document.getElementById("inp-phone").placeholder = t.phone;
+    document.getElementById("inp-model").placeholder = t.model;
+    document.getElementById("inp-loc").placeholder = t.loc;
+    document.getElementById("inp-mon").placeholder = t.mon;
+    document.getElementById("inp-year").placeholder = t.year;
 
-      <div class="filters">
-        <div class="mini">
-          <label><span id="lbl-model-filter">Model</span><span class="pill" id="model-count">0</span></label>
-          <input id="filter-model" type="text" placeholder="Search model...">
-        </div>
+    document.getElementById("txt-title-take").innerText = t.title_take;
+    document.getElementById("btn-back-top").innerText = t.backTop;
 
-        <div class="mini">
-          <label><span id="lbl-city-filter">City</span><span class="pill" id="city-count">0</span></label>
-          <input id="filter-city" type="text" placeholder="Search city...">
-        </div>
+    document.getElementById("lbl-model-filter").innerText = t.modelF;
+    document.getElementById("lbl-city-filter").innerText = t.cityF;
+    document.getElementById("lbl-price-filter").innerText = t.priceF;
 
-        <div class="mini">
-          <label><span id="lbl-price-filter">Max Price</span><span class="pill" id="price-val">$2500</span></label>
-          <input id="filter-price" type="range" min="100" max="10000" value="2500">
-        </div>
-      </div>
+    overlaySearch.placeholder = t.search || "Search...";
+    setDirIfNeeded(lang);
+  }
 
-      <div class="car-grid" id="car-grid"></div>
+  function setLang(lang){
+    localStorage.setItem("lang", lang);
+    applyText(lang);
+    overlay.style.display = "none";
+  }
 
-      <p id="empty-msg" style="opacity:.6;text-align:center;margin-top:18px;display:none;">
-        No cars found for these filters.
-      </p>
-    </div>
+  function buildLanguageOverlay(){
+    overlayMode = "language";
+    clearOverlay();
+    overlayTitle.innerText = "Select Language";
+    overlayBackBtn.style.display = "none";
 
-  </div>
+    langList50.forEach(l => {
+      const btn = document.createElement("button");
+      btn.className = "action-btn";
+      btn.innerHTML = `<i class="fa-solid fa-language"></i> <span>${l}</span>`;
+      btn.onclick = () => setLang(l);
+      overlayContent.appendChild(btn);
+    });
 
-  <script>
-    /* ===================== 50 Languages ===================== */
-    const langList50 = [
-      "O'zbek", "English", "Русский", "Türkçe", "Deutsch", "Français", "Español", "Italiano", "Português",
-      "O'zbek (Krill)", "Қазақша", "Кыргызcha", "Тоҷикӣ", "Türkmençe", "العربية", "فارسی", "Azərbaycan",
-      "Polski", "Nederlands", "한국어", "日本語", "中文", "हिन्दी", "Tiếng Việt", "ไทย",
-      "Svenska", "Norsk", "Dansk", "Suomi", "Ελληνικά", "Magyar", "Čeština", "Română",
-      "Български", "Українська", "Hrvatski", "Srpski", "Slovenčina", "Lietuvių", "Latviešu",
-      "Eesti", "עברית", "বাংলা", "اردو", "മലയാളം", "தமிழ்", "తెలుగు", "ಕನ್ನಡ", "ગુજરાતી", "Filipino"
-    ];
+    overlay.style.display = "flex";
+  }
 
-    /* Asosiy tarjimalar (qolgani Englishga tushadi) */
-    const translations = {
-      "English": { login:"Login", give:"Rent Out", take:"Rent In", givesub:"Add a car", takesub:"Search car", reg:"Registration", submit:"Continue", back:"← Back", name:"Full Name", phone:"Phone", model:"Car Model", loc:"Location", mon:"Monthly ($)", year:"Yearly ($)", title_take:"Available Cars", search:"Search...", backTop:"Back", modelF:"Model", cityF:"City", priceF:"Max Price" },
-      "O'zbek": { login:"Kirish", give:"Ijaraga berish", take:"Ijaraga olish", givesub:"Mashina qo'shish", takesub:"Mashina qidirish", reg:"Ro‘yxatdan o‘tish", submit:"Davom etish", back:"← Orqaga", name:"F.I.Sh", phone:"Telefon", model:"Mashina modeli", loc:"Manzil (Shahar)", mon:"Oylik ($)", year:"Yillik ($)", title_take:"Mavjud mashinalar", search:"Qidirish...", backTop:"Orqaga", modelF:"Model", cityF:"Shahar", priceF:"Maks narx" },
-      "Русский": { login:"Вход", give:"Сдать", take:"Снять", givesub:"Добавить авто", takesub:"Поиск авто", reg:"Регистрация", submit:"Продолжить", back:"← Назад", name:"ФИО", phone:"Телефон", model:"Модель авто", loc:"Город", mon:"В месяц ($)", year:"В год ($)", title_take:"Доступные авто", search:"Поиск...", backTop:"Назад", modelF:"Модель", cityF:"Город", priceF:"Макс. цена" },
-      "العربية": { login:"دخول", give:"تأجير", take:"استئجار", givesub:"إضافة سيارة", takesub:"بحث", reg:"تسجيل", submit:"متابعة", back:"← رجوع", name:"الاسم الكامل", phone:"الهاتف", model:"موديل السيارة", loc:"المدينة", mon:"شهري ($)", year:"سنوي ($)", title_take:"السيارات المتاحة", search:"بحث...", backTop:"رجوع", modelF:"الموديل", cityF:"المدينة", priceF:"أقصى سعر" }
-    };
+  function renderCountries(list){
+    overlayContent.innerHTML = "";
 
-    langList50.forEach(l => { if(!translations[l]) translations[l] = translations["English"]; });
+    const pop = list.filter(x => popularCountryCodes.includes(x.c));
+    const rest = list.filter(x => !popularCountryCodes.includes(x.c));
 
-    /* ===================== Countries + popular ===================== */
-    const countries = [
-      { n:"Uzbekistan", flag:"🇺🇿", c:"+998" },
-      { n:"USA", flag:"🇺🇸", c:"+1" },
-      { n:"Russia", flag:"🇷🇺", c:"+7" },
-      { n:"Turkey", flag:"🇹🇷", c:"+90" },
-      { n:"Germany", flag:"🇩🇪", c:"+49" },
-      { n:"United Kingdom", flag:"🇬🇧", c:"+44" },
-      { n:"UAE", flag:"🇦🇪", c:"+971" },
-      { n:"Kazakhstan", flag:"🇰🇿", c:"+7" },
-      { n:"Kyrgyzstan", flag:"🇰🇬", c:"+996" },
-      { n:"Tajikistan", flag:"🇹🇯", c:"+992" },
-      { n:"South Korea", flag:"🇰🇷", c:"+82" },
-      { n:"Poland", flag:"🇵🇱", c:"+48" },
-      { n:"France", flag:"🇫🇷", c:"+33" },
-      { n:"Italy", flag:"🇮🇹", c:"+39" },
-      { n:"Egypt", flag:"🇪🇬", c:"+20" },
-      { n:"India", flag:"🇮🇳", c:"+91" },
-      { n:"Japan", flag:"🇯🇵", c:"+81" },
-      { n:"China", flag:"🇨🇳", c:"+86" }
-    ];
-    const popularCountryCodes = ["+998","+7","+1","+90","+971","+44","+49"];
-
-    /* ===================== Overlay controller ===================== */
-    let overlayMode = "language"; // "language" | "country"
-    let currentMode = "";
-
-    const overlay = document.getElementById("overlay-screen");
-    const overlayTitle = document.getElementById("overlay-title");
-    const overlayContent = document.getElementById("overlay-content");
-    const overlaySearch = document.getElementById("overlay-search");
-    const overlayBackBtn = document.getElementById("overlay-back-btn");
-
-    function clearOverlay(){
-      overlayContent.innerHTML = "";
-      overlaySearch.value = "";
+    if(pop.length){
+      const label = document.createElement("div");
+      label.className = "section-label";
+      label.innerText = "Popular";
+      overlayContent.appendChild(label);
+      pop.forEach(item => overlayContent.appendChild(countryBtn(item)));
     }
 
-    function setDirIfNeeded(lang){
-      document.body.dir = (lang === "العربية") ? "rtl" : "ltr";
-    }
+    const label2 = document.createElement("div");
+    label2.className = "section-label";
+    label2.innerText = "All Countries";
+    overlayContent.appendChild(label2);
 
-    function applyText(lang){
-      const t = translations[lang] || translations["English"];
+    rest.forEach(item => overlayContent.appendChild(countryBtn(item)));
+  }
 
-      document.getElementById("txt-login").innerText = t.login;
-      document.getElementById("txt-give").innerText = t.give;
-      document.getElementById("txt-take").innerText = t.take;
-      document.getElementById("txt-givesub").innerText = t.givesub;
-      document.getElementById("txt-takesub").innerText = t.takesub;
-
-      document.getElementById("reg-title").innerText = t.reg;
-      document.getElementById("btn-next").innerText = t.submit;
-      document.getElementById("txt-back").innerText = t.back;
-
-      document.getElementById("inp-name").placeholder = t.name;
-      document.getElementById("inp-phone").placeholder = t.phone;
-      document.getElementById("inp-model").placeholder = t.model;
-      document.getElementById("inp-loc").placeholder = t.loc;
-      document.getElementById("inp-mon").placeholder = t.mon;
-      document.getElementById("inp-year").placeholder = t.year;
-
-      document.getElementById("txt-title-take").innerText = t.title_take;
-      document.getElementById("btn-back-top").innerText = t.backTop;
-
-      document.getElementById("lbl-model-filter").innerText = t.modelF;
-      document.getElementById("lbl-city-filter").innerText = t.cityF;
-      document.getElementById("lbl-price-filter").innerText = t.priceF;
-
-      overlaySearch.placeholder = t.search || "Search...";
-      setDirIfNeeded(lang);
-    }
-
-    function setLang(lang){
-      localStorage.setItem("lang", lang);
-      applyText(lang);
+  function countryBtn(item){
+    const btn = document.createElement("button");
+    btn.className = "action-btn";
+    btn.innerHTML = `<span style="font-size:18px">${item.flag}</span><span>${item.n}</span><span class="badge">${item.c}</span>`;
+    btn.onclick = () => {
+      document.getElementById("country-flag").innerText = item.flag;
+      document.getElementById("country-dial").innerText = item.c;
       overlay.style.display = "none";
-    }
+    };
+    return btn;
+  }
 
-    function buildLanguageOverlay(){
-      overlayMode = "language";
-      clearOverlay();
-      overlayTitle.innerText = "Select Language";
-      overlayBackBtn.style.display = "none";
+  function buildCountryOverlay(){
+    overlayMode = "country";
+    clearOverlay();
+    overlayTitle.innerText = "Select Country Code";
+    overlayBackBtn.style.display = "flex";
+    overlayBackBtn.onclick = () => { overlay.style.display = "none"; };
+    renderCountries(countries);
+    overlay.style.display = "flex";
+  }
 
-      langList50.forEach(l => {
+  overlaySearch.addEventListener("input", () => {
+    const q = overlaySearch.value.trim().toLowerCase();
+
+    if(overlayMode === "language"){
+      const filtered = langList50.filter(x => x.toLowerCase().includes(q));
+      overlayContent.innerHTML = "";
+      filtered.forEach(l => {
         const btn = document.createElement("button");
         btn.className = "action-btn";
         btn.innerHTML = `<i class="fa-solid fa-language"></i> <span>${l}</span>`;
         btn.onclick = () => setLang(l);
         overlayContent.appendChild(btn);
       });
-
-      overlay.style.display = "flex";
+    } else {
+      const filtered = countries.filter(x =>
+        x.n.toLowerCase().includes(q) || x.c.toLowerCase().includes(q)
+      );
+      renderCountries(filtered);
     }
+  });
 
-    function renderCountries(list){
-      overlayContent.innerHTML = "";
+  function openCountryPicker(){ buildCountryOverlay(); }
 
-      // Popular
-      const pop = list.filter(x => popularCountryCodes.includes(x.c));
-      const rest = list.filter(x => !popularCountryCodes.includes(x.c));
+  /* ===================== Cars: localStorage + filtering ===================== */
+  const LS_KEY = "temurrent_cars_v1";
 
-      if(pop.length){
-        const label = document.createElement("div");
-        label.className = "section-label";
-        label.innerText = "Popular";
-        overlayContent.appendChild(label);
+  function getCars(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+  function setCars(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
 
-        pop.forEach(item => overlayContent.appendChild(countryBtn(item)));
-      }
+  function seedDemoIfEmpty(){
+    const cars = getCars();
+    if(cars.length) return;
 
-      const label2 = document.createElement("div");
-      label2.className = "section-label";
-      label2.innerText = "All Countries";
-      overlayContent.appendChild(label2);
+    setCars([
+      { id: cryptoId(), model:"Chevrolet Tahoe", city:"Tashkent", monthly:1200, yearly:12000, phone:"+998901234567", country:"+998", flag:"🇺🇿", owner:"Temur", tag:"Available" },
+      { id: cryptoId(), model:"Mercedes-Benz G63", city:"Dubai", monthly:5500, yearly:55000, phone:"+971501112233", country:"+971", flag:"🇦🇪", owner:"Owner", tag:"Premium" },
+      { id: cryptoId(), model:"Gentra 2024", city:"Namangan", monthly:450, yearly:4500, phone:"+998901112233", country:"+998", flag:"🇺🇿", owner:"User", tag:"Available" },
+    ]);
+  }
 
-      rest.forEach(item => overlayContent.appendChild(countryBtn(item)));
-    }
+  function cryptoId(){
+    return (Math.random().toString(16).slice(2) + Date.now().toString(16));
+  }
 
-    function countryBtn(item){
-      const btn = document.createElement("button");
-      btn.className = "action-btn";
-      btn.innerHTML = `<span style="font-size:18px">${item.flag}</span><span>${item.n}</span><span class="badge">${item.c}</span>`;
-      btn.onclick = () => {
-        document.getElementById("country-flag").innerText = item.flag;
-        document.getElementById("country-dial").innerText = item.c;
-        overlay.style.display = "none";
-      };
-      return btn;
-    }
+  function renderCars(){
+    const grid = document.getElementById("car-grid");
+    const empty = document.getElementById("empty-msg");
 
-    function buildCountryOverlay(){
-      overlayMode = "country";
-      clearOverlay();
-      overlayTitle.innerText = "Select Country Code";
-      overlayBackBtn.style.display = "flex";
-      overlayBackBtn.onclick = () => { overlay.style.display = "none"; };
-      renderCountries(countries);
-      overlay.style.display = "flex";
-    }
+    const modelQ = document.getElementById("filter-model").value.trim().toLowerCase();
+    const cityQ  = document.getElementById("filter-city").value.trim().toLowerCase();
+    const maxP   = Number(document.getElementById("filter-price").value);
 
-    overlaySearch.addEventListener("input", () => {
-      const q = overlaySearch.value.trim().toLowerCase();
+    document.getElementById("price-val").innerText = "$" + maxP;
 
-      if(overlayMode === "language"){
-        const filtered = langList50.filter(x => x.toLowerCase().includes(q));
-        overlayContent.innerHTML = "";
-        filtered.forEach(l => {
-          const btn = document.createElement("button");
-          btn.className = "action-btn";
-          btn.innerHTML = `<i class="fa-solid fa-language"></i> <span>${l}</span>`;
-          btn.onclick = () => setLang(l);
-          overlayContent.appendChild(btn);
-        });
-      } else {
-        const filtered = countries.filter(x =>
-          x.n.toLowerCase().includes(q) || x.c.toLowerCase().includes(q)
-        );
-        renderCountries(filtered);
-      }
+    const all = getCars();
+
+    document.getElementById("model-count").innerText = all.length;
+    const uniqueCities = [...new Set(all.map(x => (x.city||"").toLowerCase()).filter(Boolean))];
+    document.getElementById("city-count").innerText = uniqueCities.length;
+
+    const filtered = all.filter(c => {
+      const m = (c.model||"").toLowerCase();
+      const ct = (c.city||"").toLowerCase();
+      const price = Number(c.monthly||0);
+      if(modelQ && !m.includes(modelQ)) return false;
+      if(cityQ && !ct.includes(cityQ)) return false;
+      if(price > maxP) return false;
+      return true;
     });
 
-    function openCountryPicker(){ buildCountryOverlay(); }
-
-    /* ===================== Cars: localStorage + filtering ===================== */
-    const LS_KEY = "temurrent_cars_v1";
-
-    function getCars(){
-      try{
-        const raw = localStorage.getItem(LS_KEY);
-        if(!raw) return [];
-        const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr : [];
-      }catch(e){ return []; }
+    grid.innerHTML = "";
+    if(!filtered.length){
+      empty.style.display = "block";
+      return;
     }
+    empty.style.display = "none";
 
-    function setCars(arr){
-      localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    filtered.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "car-item";
+      div.innerHTML = `
+        <div class="car-tag">${escapeHtml(c.tag || "Available")}</div>
+        <h3 style="margin-bottom:6px;">${escapeHtml(c.model || "Car")}</h3>
+        <p class="muted" style="margin-bottom:14px;">
+          <i class="fas fa-map-marker-alt"></i>
+          ${escapeHtml((c.city||"Unknown"))}
+          <span style="margin-left:8px;opacity:.85;">${escapeHtml(c.flag||"")} ${escapeHtml(c.country||"")}</span>
+        </p>
+
+        <div class="row">
+          <span class="car-price">$${Number(c.monthly||0)} <small style="font-size:10px;opacity:.55;">/mo</small></span>
+          <button class="action-btn" style="background:var(--secondary);border:none;justify-content:center;"
+            onclick="alert('Contact: ${escapeHtml(c.phone || '')}')">
+            <i class="fas fa-phone"></i> Contact
+          </button>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <span class="pill">Year: $${Number(c.yearly||0)}</span>
+          <span class="pill">Owner: ${escapeHtml(c.owner || "User")}</span>
+        </div>
+      `;
+      grid.appendChild(div);
+    });
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function resetDemoData(){
+    localStorage.removeItem(LS_KEY);
+    seedDemoIfEmpty();
+    renderCars();
+    alert("Reset done.");
+  }
+
+  /* ===================== Page actions ===================== */
+  function showRegistration(mode){
+    currentMode = mode;
+
+    document.getElementById("step-choice").classList.add("hidden");
+    document.getElementById("car-results").classList.add("hidden");
+    document.getElementById("form-register").classList.remove("hidden");
+
+    if(mode === "give"){
+      document.getElementById("extra-fields").classList.remove("hidden");
+    } else {
+      document.getElementById("extra-fields").classList.add("hidden");
     }
+  }
 
-    function seedDemoIfEmpty(){
-      const cars = getCars();
-      if(cars.length) return;
-
-      setCars([
-        { id: cryptoId(), model:"Chevrolet Tahoe", city:"Tashkent", monthly:1200, yearly:12000, phone:"+998901234567", country:"+998", flag:"🇺🇿", owner:"Temur", tag:"Available" },
-        { id: cryptoId(), model:"Mercedes-Benz G63", city:"Dubai", monthly:5500, yearly:55000, phone:"+971501112233", country:"+971", flag:"🇦🇪", owner:"Owner", tag:"Premium" },
-        { id: cryptoId(), model:"Gentra 2024", city:"Namangan", monthly:450, yearly:4500, phone:"+998901112233", country:"+998", flag:"🇺🇿", owner:"User", tag:"Available" },
-      ]);
-    }
-
-    function cryptoId(){
-      return (Math.random().toString(16).slice(2) + Date.now().toString(16));
-    }
-
-    function renderCars(){
-      const grid = document.getElementById("car-grid");
-      const empty = document.getElementById("empty-msg");
-
-      const modelQ = document.getElementById("filter-model").value.trim().toLowerCase();
-      const cityQ  = document.getElementById("filter-city").value.trim().toLowerCase();
-      const maxP   = Number(document.getElementById("filter-price").value);
-
-      document.getElementById("price-val").innerText = "$" + maxP;
-
-      const all = getCars();
-
-      // counts
-      document.getElementById("model-count").innerText = all.length;
-      const uniqueCities = [...new Set(all.map(x => (x.city||"").toLowerCase()).filter(Boolean))];
-      document.getElementById("city-count").innerText = uniqueCities.length;
-
-      const filtered = all.filter(c => {
-        const m = (c.model||"").toLowerCase();
-        const ct = (c.city||"").toLowerCase();
-        const price = Number(c.monthly||0);
-        if(modelQ && !m.includes(modelQ)) return false;
-        if(cityQ && !ct.includes(cityQ)) return false;
-        if(price > maxP) return false;
-        return true;
-      });
-
-      grid.innerHTML = "";
-      if(!filtered.length){
-        empty.style.display = "block";
-        return;
-      }
-      empty.style.display = "none";
-
-      filtered.forEach(c => {
-        const div = document.createElement("div");
-        div.className = "car-item";
-        div.innerHTML = `
-          <div class="car-tag">${escapeHtml(c.tag || "Available")}</div>
-          <h3 style="margin-bottom:6px;">${escapeHtml(c.model || "Car")}</h3>
-          <p class="muted" style="margin-bottom:14px;">
-            <i class="fas fa-map-marker-alt"></i>
-            ${escapeHtml((c.city||"Unknown"))}
-            <span style="margin-left:8px;opacity:.85;">${escapeHtml(c.flag||"")} ${escapeHtml(c.country||"")}</span>
-          </p>
-
-          <div class="row">
-            <span class="car-price">$${Number(c.monthly||0)} <small style="font-size:10px;opacity:.55;">/mo</small></span>
-            <button class="action-btn" style="background:var(--secondary);border:none;justify-content:center;"
-              onclick="alert('Contact: ${escapeHtml(c.phone || '')}')">
-              <i class="fas fa-phone"></i> Contact
-            </button>
-          </div>
-
-          <div class="row" style="margin-top:10px;">
-            <span class="pill">Year: $${Number(c.yearly||0)}</span>
-            <span class="pill">Owner: ${escapeHtml(c.owner || "User")}</span>
-          </div>
-        `;
-        grid.appendChild(div);
-      });
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function resetDemoData(){
-      localStorage.removeItem(LS_KEY);
-      seedDemoIfEmpty();
-      renderCars();
-      alert("Reset done.");
-    }
-
-    /* ===================== Page actions ===================== */
-    function showRegistration(mode){
-      currentMode = mode;
-
-      document.getElementById("step-choice").classList.add("hidden");
-      document.getElementById("car-results").classList.add("hidden");
-      document.getElementById("form-register").classList.remove("hidden");
-
-      if(mode === "give"){
-        document.getElementById("extra-fields").classList.remove("hidden");
-        document.getElementById("btn-next").innerText = (translations[localStorage.getItem("lang")] || translations["English"]).submit;
-      } else {
-        document.getElementById("extra-fields").classList.add("hidden");
-        document.getElementById("btn-next").innerText = (translations[localStorage.getItem("lang")] || translations["English"]).submit;
-      }
-    }
-
-    function handleFormSubmit(){
-      if(currentMode === "take"){
-        document.getElementById("form-register").classList.add("hidden");
-        document.getElementById("car-results").classList.remove("hidden");
-        renderCars();
-        return;
-      }
-
-      // GIVE: validate + save
-      const name = document.getElementById("inp-name").value.trim();
-      const phoneDigits = document.getElementById("inp-phone").value.trim();
-      const model = document.getElementById("inp-model").value.trim();
-      const city  = document.getElementById("inp-loc").value.trim();
-      const mon   = Number(document.getElementById("inp-mon").value);
-      const year  = Number(document.getElementById("inp-year").value);
-
-      const dial = document.getElementById("country-dial").innerText.trim();
-      const flag = document.getElementById("country-flag").innerText.trim();
-
-      if(!name || !phoneDigits || !model || !city || !mon){
-        alert("Fill all required fields (name, phone, model, city, monthly).");
-        return;
-      }
-
-      const fullPhone = `${dial}${phoneDigits}`;
-
-      const cars = getCars();
-      cars.unshift({
-        id: cryptoId(),
-        model,
-        city,
-        monthly: mon,
-        yearly: isNaN(year) ? 0 : year,
-        phone: fullPhone,
-        country: dial,
-        flag,
-        owner: name,
-        tag: "New"
-      });
-      setCars(cars);
-
-      alert("Success! Your car is posted.");
+  function handleFormSubmit(){
+    if(currentMode === "take"){
       document.getElementById("form-register").classList.add("hidden");
       document.getElementById("car-results").classList.remove("hidden");
       renderCars();
+      return;
     }
 
-    function goBack(){
-      document.getElementById("step-choice").classList.remove("hidden");
-      document.getElementById("form-register").classList.add("hidden");
-      document.getElementById("car-results").classList.add("hidden");
+    const name = document.getElementById("inp-name").value.trim();
+    const phoneDigits = document.getElementById("inp-phone").value.trim();
+    const model = document.getElementById("inp-model").value.trim();
+    const city  = document.getElementById("inp-loc").value.trim();
+    const mon   = Number(document.getElementById("inp-mon").value);
+    const year  = Number(document.getElementById("inp-year").value);
+
+    const dial = document.getElementById("country-dial").innerText.trim();
+    const flag = document.getElementById("country-flag").innerText.trim();
+
+    if(!name || !phoneDigits || !model || !city || !mon){
+      alert("Fill all required fields (name, phone, model, city, monthly).");
+      return;
     }
 
-    // phone only digits
-    document.getElementById("inp-phone").addEventListener("input", (e) => {
-      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+    const fullPhone = `${dial}${phoneDigits}`;
+
+    const cars = getCars();
+    cars.unshift({
+      id: cryptoId(),
+      model,
+      city,
+      monthly: mon,
+      yearly: isNaN(year) ? 0 : year,
+      phone: fullPhone,
+      country: dial,
+      flag,
+      owner: name,
+      tag: "New"
     });
+    setCars(cars);
 
-    // filter listeners
-    document.getElementById("filter-model").addEventListener("input", renderCars);
-    document.getElementById("filter-city").addEventListener("input", renderCars);
-    document.getElementById("filter-price").addEventListener("input", renderCars);
+    alert("Success! Your car is posted.");
+    document.getElementById("form-register").classList.add("hidden");
+    document.getElementById("car-results").classList.remove("hidden");
+    renderCars();
+  }
 
-    /* ===================== Start ===================== */
-    seedDemoIfEmpty();
-    buildLanguageOverlay();
+  function goBack(){
+    document.getElementById("step-choice").classList.remove("hidden");
+    document.getElementById("form-register").classList.add("hidden");
+    document.getElementById("car-results").classList.add("hidden");
+  }
 
-    // auto apply saved language
-    const savedLang = localStorage.getItem("lang");
-    if(savedLang){
-      applyText(savedLang);
-      overlay.style.display = "none";
-    } else {
-      applyText("English");
-    }
-  </script>
-</body>
-</html>
+  document.getElementById("inp-phone").addEventListener("input", (e) => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+  });
+
+  document.getElementById("filter-model").addEventListener("input", renderCars);
+  document.getElementById("filter-city").addEventListener("input", renderCars);
+  document.getElementById("filter-price").addEventListener("input", renderCars);
+
+  /* ===================== Start ===================== */
+  seedDemoIfEmpty();
+  buildLanguageOverlay();
+
+  const savedLang = localStorage.getItem("lang");
+  if(savedLang){
+    applyText(savedLang);
+    overlay.style.display = "none";
+  } else {
+    applyText("English");
+  }
+</script>
